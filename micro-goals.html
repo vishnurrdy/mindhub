@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Mind Hub - Micro Goal Planner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/site.js"></script>
+    <style>
+      .task-list {
+        max-height: 60vh;
+        overflow-y: auto;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 min-h-screen font-sans">
+    <div class="max-w-4xl mx-auto p-6">
+      <a href="Dashboard.html" class="text-teal-600 hover:underline"
+        >← Back to Dashboard</a
+      >
+      <h1 id="plannerTitle" class="text-2xl font-bold mt-4">
+        Micro Goal Planner
+      </h1>
+      <p class="text-gray-600 mt-1">
+        Break big tasks into small, achievable micro-goals to manage academic
+        pressure.
+      </p>
+
+      <div class="mt-6 bg-white rounded-lg shadow p-6">
+        <div class="flex gap-3 mb-3">
+          <input
+            id="goalTitle"
+            placeholder="New goal title (e.g. Finish chapter 3)"
+            class="flex-grow border rounded px-3 py-2"
+          />
+          <button id="addGoal" class="bg-teal-600 text-white px-4 py-2 rounded">
+            Add Goal
+          </button>
+        </div>
+        <div class="task-list space-y-3" id="goalsList"></div>
+      </div>
+
+      <div class="mt-4 text-sm text-gray-500">
+        Tips: create goals with 2-4 micro-steps, set small deadlines, celebrate
+        each completed step.
+      </div>
+    </div>
+    <script src="js/micro-goals.js"></script>
+  </body>
+</html>

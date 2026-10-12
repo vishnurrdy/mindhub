@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Mind Hub - Counselling</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/i18n.js"></script>
+  </head>
+  <body class="bg-gray-100 min-h-screen font-sans">
+    <div class="max-w-4xl mx-auto p-6">
+      <a
+        href="Dashboard.html"
+        class="text-teal-600 hover:underline"
+        data-i18n="back_dashboard"
+        >← Back to Dashboard</a
+      >
+      <h1 class="text-2xl font-bold mt-4" data-i18n="site_name">Mind Hub</h1>
+      <p class="text-gray-600 mt-1">
+        Book or view your counselling sessions (demo).
+      </p>
+
+      <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-lg shadow p-6 md:col-span-2">
+          <h2 class="font-semibold text-lg">Available counsellors & slots</h2>
+          <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700"
+                >Select counsellor</label
+              >
+              <select
+                id="counsellor"
+                class="mt-1 block w-full rounded-md border-gray-200"
+              ></select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700"
+                >Select date</label
+              >
+              <input
+                id="datePick"
+                type="date"
+                class="mt-1 block w-full rounded-md border-gray-200"
+              />
+            </div>
+          </div>
+
+          <div id="slotsArea" class="mt-4">
+            <h3 class="font-medium">Available slots</h3>
+            <div
+              id="slotsList"
+              class="mt-2 grid grid-cols-2 md:grid-cols-4 gap-2"
+            ></div>
+          </div>
+
+          <div class="mt-6">
+            <h3 class="font-semibold">Ongoing / Upcoming sessions</h3>
+            <ul id="sessionList" class="mt-3 space-y-3 text-gray-700"></ul>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6">
+          <h2 class="font-semibold text-lg">Book a session</h2>
+          <form id="bookForm" class="mt-4 space-y-3">
+            <div>
+              <label class="block text-sm font-medium text-gray-700"
+                >Selected slot</label
+              >
+              <div id="selectedSlot" class="mt-1 text-gray-800">None</div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700"
+                >Notes (optional)</label
+              >
+              <textarea
+                id="notes"
+                class="mt-1 block w-full rounded-md border-gray-200"
+                rows="3"
+                placeholder="Anything you want the counsellor to know..."
+              ></textarea>
+            </div>
+            <button
+              type="submit"
+              class="bg-teal-600 text-white px-4 py-2 rounded"
+            >
+              Confirm booking
+            </button>
+            <p id="bmsg" class="text-sm mt-2"></p>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Protect page: redirect to login if not signed in
+      (function () {
+        if (!localStorage.getItem("wh_user")) {
+          window.location.href = "Login/index.html";
+        }
+      })();
+
+      // Doctors and availability (demo dataset)
+      const DOCTORS_KEY = "wh_doctors_demo";
+      const BOOKINGS_KEY = "wh_bookings_demo";
+
+      const defaultDoctors = [
+        {
+          id: "dr_sarah",
+          name: "Dr. Sarah Lee",
+          specialty: "Mental Health",
+          capacity: 1, // one patient per slot
+          // weekly schedule: 0=Sun..6=Sat, times in 24h HH:MM
+          schedule: {
+            1: ["10:00", "11:00", "14:00", "15:00"],
+            3: ["10:00", "11:00", "14:00"],
+            5: ["09:00", "10:00", "11:00", "13:00"],
+          },
+        },
+        {
+          id: "dr_john",
+          name: "John Smith",
+          specialty: "Nutrition",
+          capacity: 2,
+          schedule: {
+            2: ["09:00", "10:00", "11:00"],
+            4: ["13:00", "14:00"],
+            5: ["10:00", "11:00"],
+          },
+        },
+        {
+          id: "dr_emily",
+          name: "Emily Johnson",
+          specialty: "Fitness Coach",
+          capacity: 3,
+          schedule: {
+            1: ["08:00", "09:00", "17:00"],
+            2: ["08:00", "09:00", "17:00"],
+            4: ["08:00", "09:00"],
+          },
+        },
+      ];
+
+      function loadDoctors() {
+        try {
+          return (
+            JSON.parse(localStorage.getItem(DOCTORS_KEY)) || defaultDoctors
+          );
+        } catch (e) {
+          return defaultDoctors;
+        }
+      }
+      function saveDoctors(list) {
+        localStorage.setItem(DOCTORS_KEY, JSON.stringify(list));
+      }
+
+      function loadBookings() {
+        try {
+          return JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
+        } catch (e) {
+          return [];
+        }
+      }
+      function saveBookings(list) {
+        localStorage.setItem(BOOKINGS_KEY, JSON.stringify(list));
+      }
+
+      let doctors = loadDoctors();
+      let bookings = loadBookings();
+
+      const counsellorSelect = document.getElementById("counsellor");
+      const datePick = document.getElementById("datePick");
+      const slotsList = document.getElementById("slotsList");
+      const selectedSlotEl = document.getElementById("selectedSlot");
+      const sessionList = document.getElementById("sessionList");
+
+      let selected = null; // {doctorId, datetime}
+      let editingBookingId = null; // if rescheduling an existing booking
+
+      function initDoctors() {
+        counsellorSelect.innerHTML = "";
+        doctors.forEach((d) => {
+          const opt = document.createElement("option");
+          opt.value = d.id;
+          opt.textContent = `${d.name} — ${d.specialty}`;
+          counsellorSelect.appendChild(opt);
+        });
+      }
+      initDoctors();
+
+      // Utility: get date string YYYY-MM-DD and combine with time
+      function toDateTime(dateStr, timeStr) {
+        return new Date(dateStr + "T" + timeStr + ":00");
+      }
+
+      function formatSlot(dt) {
+        return dt.toLocaleString();
+      }
+
+      // Generate slots for selected doctor and date
+      function renderSlots() {
+        slotsList.innerHTML = "";
+        const docId = counsellorSelect.value;
+        const date = datePick.value;
+        if (!docId || !date) {
+          slotsList.innerHTML =
+            '<div class="text-sm text-gray-500">Choose a doctor and date to see slots.</div>';
+          return;
+        }
+        const doc = doctors.find((d) => d.id === docId);
+        const weekday = new Date(date).getDay();
+        const times = doc.schedule[weekday] || [];
+        if (!times.length) {
+          slotsList.innerHTML =
+            '<div class="text-sm text-gray-500">No slots available on this date.</div>';
+          return;
+        }
+        times.forEach((t) => {
+          const dt = toDateTime(date, t);
+          const count = bookings.filter(
+            (b) =>
+              b.doctorId === docId &&
+              b.datetime === dt.toISOString() &&
+              b.status !== "cancelled"
+          ).length;
+          const free = doc.capacity - count;
+          const btn = document.createElement("button");
+          btn.className = "px-3 py-2 rounded border text-sm";
+          btn.textContent = `${t} (${free} free)`;
+          if (free <= 0) btn.disabled = true;
+          btn.addEventListener("click", () => {
+            selected = { doctorId: docId, datetime: dt.toISOString() };
+            selectedSlotEl.textContent = `${doc.name} — ${formatSlot(dt)}`;
+          });
+          slotsList.appendChild(btn);
+        });
+      }
+
+      // Render sessions (upcoming & ongoing)
+      function renderSessions() {
+        bookings = loadBookings();
+        sessionList.innerHTML = "";
+        const now = Date.now();
+        const upcoming = bookings
+          .filter((b) => new Date(b.datetime).getTime() >= now)
+          .sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
+        if (!upcoming.length) {
+          sessionList.innerHTML =
+            '<li class="text-sm text-gray-500">No upcoming sessions.</li>';
+          return;
+        }
+        upcoming.forEach((b) => {
+          const li = document.createElement("li");
+          li.className = "border rounded p-3 flex justify-between items-start";
+          const left = document.createElement("div");
+          const doc = doctors.find((d) => d.id === b.doctorId);
+          left.innerHTML = `<div class="font-medium">${
+            doc ? doc.name : b.doctorId
+          } — ${
+            doc ? doc.specialty : ""
+          }</div><div class="text-sm text-gray-600">${new Date(
+            b.datetime
+          ).toLocaleString()}</div><div class="text-sm text-gray-700 mt-1">Patient: ${
+            b.patientEmail || "Anonymous"
+          }</div><div class="text-sm text-gray-600">Notes: ${
+            b.notes || "-"
+          }</div>`;
+          const right = document.createElement("div");
+          const nowMs = Date.now();
+          const start = new Date(b.datetime).getTime();
+          if (nowMs >= start && nowMs < start + 60 * 60 * 1000) {
+            // ongoing within one hour
+            const tag = document.createElement("span");
+            tag.className =
+              "text-sm bg-yellow-100 text-yellow-800 px-2 py-1 rounded";
+            tag.textContent = "Ongoing";
+            right.appendChild(tag);
+          } else {
+            const tag = document.createElement("span");
+            tag.className =
+              "text-sm bg-green-100 text-green-800 px-2 py-1 rounded";
+            tag.textContent = "Upcoming";
+            right.appendChild(tag);
+          }
+          // show number of patients in that slot
+          const count = bookings.filter(
+            (x) => x.doctorId === b.doctorId && x.datetime === b.datetime
+          ).length;
+          const cap = doc ? doc.capacity : 1;
+          const capEl = document.createElement("div");
+          capEl.className = "text-sm text-gray-500 mt-2";
+          capEl.textContent = `Patients: ${count}/${cap}`;
+          right.appendChild(capEl);
+          // Actions: Cancel, Reschedule
+          const actions = document.createElement("div");
+          actions.className = "mt-2 flex flex-col gap-2";
+          const btnRes = document.createElement("button");
+          btnRes.className = "text-sm px-3 py-1 bg-yellow-100 rounded";
+          btnRes.textContent = "Reschedule";
+          btnRes.addEventListener("click", () => startReschedule(b.id));
+          const btnCancel = document.createElement("button");
+          btnCancel.className =
+            "text-sm px-3 py-1 bg-red-100 text-red-700 rounded";
+          btnCancel.textContent = "Cancel";
+          btnCancel.addEventListener("click", () => cancelBooking(b.id));
+          actions.appendChild(btnRes);
+          actions.appendChild(btnCancel);
+          right.appendChild(actions);
+          li.appendChild(left);
+          li.appendChild(right);
+          sessionList.appendChild(li);
+        });
+      }
+
+      counsellorSelect.addEventListener("change", renderSlots);
+      datePick.addEventListener("change", renderSlots);
+
+      // initialize date to today
+      datePick.value = new Date().toISOString().slice(0, 10);
+      renderSlots();
+      renderSessions();
+      renderAnalytics();
+      requestNotifPermission();
+
+      // Notification helper
+      function requestNotifPermission() {
+        if (!("Notification" in window)) return;
+        if (Notification.permission === "default")
+          Notification.requestPermission();
+      }
+
+      function pushNotificationFor(email, title, body) {
+        try {
+          const key = `wh_notifs_${email}`;
+          const arr = JSON.parse(localStorage.getItem(key) || "[]");
+          const item = {
+            id: "n_" + Date.now(),
+            title,
+            body,
+            ts: Date.now(),
+            read: false,
+          };
+          arr.unshift(item);
+          localStorage.setItem(key, JSON.stringify(arr));
+          // browser notification
+          if (Notification.permission === "granted")
+            new Notification(title, { body });
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      function getMyNotifications(email) {
+        try {
+          return JSON.parse(localStorage.getItem(`wh_notifs_${email}`) || "[]");
+        } catch (e) {
+          return [];
+        }
+      }
+
+      // Analytics
+      function renderAnalytics() {
+        const anal = document.getElementById("analytics");
+        if (!anal) return;
+        const byDoc = {};
+        const byDay = [0, 0, 0, 0, 0, 0, 0];
+        bookings.forEach((b) => {
+          if (b.status === "cancelled") return;
+          byDoc[b.doctorId] = (byDoc[b.doctorId] || 0) + 1;
+          const d = new Date(b.datetime).getDay();
+          byDay[d]++;
+        });
+        const docLines = Object.keys(byDoc)
+          .map((id) => {
+            const d = doctors.find((x) => x.id === id);
+            return `<div class="text-sm">${d ? d.name : id}: <strong>${
+              byDoc[id]
+            }</strong></div>`;
+          })
+          .join("");
+        const busiest = byDay
+          .map((c, i) => ({ i, c }))
+          .sort((a, b) => b.c - a.c)[0];
+        const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        anal.innerHTML = `<div class="text-sm">${
+          docLines || '<div class="text-sm text-gray-500">No bookings yet</div>'
+        }</div><div class="mt-2 text-sm">Busiest day: <strong>${
+          days[busiest.i]
+        }</strong> (${busiest.c})</div>`;
+      }
+
+      // booking confirm
+      document.getElementById("bookForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const msg = document.getElementById("bmsg");
+        if (!selected) {
+          msg.textContent = "Select a free slot first.";
+          msg.className = "text-sm text-red-600";
+          return;
+        }
+        const notes = document.getElementById("notes").value.trim();
+        const user = JSON.parse(localStorage.getItem("wh_user") || "null");
+        // if we're editing/rescheduling an existing booking, update it
+        const doc = doctors.find((d) => d.id === selected.doctorId);
+        const count = bookings.filter(
+          (b) =>
+            b.doctorId === selected.doctorId &&
+            b.datetime === selected.datetime &&
+            b.status !== "cancelled"
+        ).length;
+        if (count >= (doc ? doc.capacity : 1)) {
+          msg.textContent = "Slot no longer available.";
+          msg.className = "text-sm text-red-600";
+          renderSlots();
+          return;
+        }
+        if (editingBookingId) {
+          const idx = bookings.findIndex((b) => b.id === editingBookingId);
+          if (idx !== -1) {
+            bookings[idx].doctorId = selected.doctorId;
+            bookings[idx].datetime = selected.datetime;
+            bookings[idx].notes = notes;
+            bookings[idx].status = "pending";
+            saveBookings(bookings);
+            msg.textContent =
+              "Rescheduled successfully. Awaiting doctor approval.";
+            msg.className = "text-sm text-green-600";
+            // notify doctor and patient
+            const b = bookings[idx];
+            pushNotificationFor(
+              b.patientEmail,
+              "Session rescheduled",
+              `Your session with ${
+                doctors.find((d) => d.id === b.doctorId).name
+              } was rescheduled and is pending approval.`
+            );
+            pushNotificationFor(
+              doctors.find((d) => d.id === b.doctorId).name,
+              "New reschedule request",
+              `Patient ${b.patientEmail} requested reschedule to ${new Date(
+                b.datetime
+              ).toLocaleString()}`
+            );
+          }
+          editingBookingId = null;
+        } else {
+          const booking = {
+            id: "b_" + Date.now(),
+            doctorId: selected.doctorId,
+            datetime: selected.datetime,
+            patientEmail: user ? user.email : "guest",
+            notes,
+            status: "pending",
+          };
+          bookings.push(booking);
+          saveBookings(bookings);
+          msg.textContent =
+            "Booked successfully (demo). Awaiting doctor approval.";
+          msg.className = "text-sm text-green-600";
+          // notify doctor and patient
+          pushNotificationFor(
+            user.email,
+            "Booking requested",
+            `Your booking with ${
+              doctors.find((d) => d.id === booking.doctorId).name
+            } on ${new Date(
+              booking.datetime
+            ).toLocaleString()} is pending approval.`
+          );
+          pushNotificationFor(
+            doctors.find((d) => d.id === booking.doctorId).name,
+            "New booking request",
+            `Patient ${user.email} requested ${new Date(
+              booking.datetime
+            ).toLocaleString()}`
+          );
+        }
+        // reset selection
+        selected = null;
+        selectedSlotEl.textContent = "None";
+        document.getElementById("notes").value = "";
+        renderSlots();
+        renderSessions();
+      });
+
+      // cancel: mark status cancelled and notify
+      function cancelBooking(id) {
+        if (!confirm("Cancel this booking?")) return;
+        const idx = bookings.findIndex((b) => b.id === id);
+        if (idx === -1) return;
+        bookings[idx].status = "cancelled";
+        saveBookings(bookings);
+        const b = bookings[idx];
+        pushNotificationFor(
+          b.patientEmail,
+          "Booking cancelled",
+          `Your booking with ${
+            doctors.find((d) => d.id === b.doctorId).name
+          } on ${new Date(b.datetime).toLocaleString()} was cancelled.`
+        );
+        pushNotificationFor(
+          doctors.find((d) => d.id === b.doctorId).name,
+          "Booking cancelled",
+          `Patient ${b.patientEmail} cancelled their booking on ${new Date(
+            b.datetime
+          ).toLocaleString()}`
+        );
+        renderSlots();
+        renderSessions();
+      }
+
+      function cancelBooking(id) {
+        if (!confirm("Cancel this booking?")) return;
+        bookings = bookings.filter((b) => b.id !== id);
+        saveBookings(bookings);
+        renderSlots();
+        renderSessions();
+      }
+
+      function startReschedule(id) {
+        const b = bookings.find((x) => x.id === id);
+        if (!b) return;
+        editingBookingId = id;
+        // set counsellor and date to the booking's doctor/date to ease rescheduling
+        counsellorSelect.value = b.doctorId;
+        const dt = new Date(b.datetime);
+        datePick.value = dt.toISOString().slice(0, 10);
+        renderSlots();
+        // preselect the slot (if still free)
+        selected = { doctorId: b.doctorId, datetime: b.datetime };
+        selectedSlotEl.textContent = `${
+          doctors.find((d) => d.id === b.doctorId).name
+        } — ${dt.toLocaleString()}`;
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    </script>
+  </body>
+</html>

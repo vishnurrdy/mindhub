@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Mind Hub - Logout</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/i18n.js"></script>
+  </head>
+  <body
+    class="bg-gray-100 min-h-screen font-sans flex items-center justify-center"
+  >
+    <div class="bg-white p-8 rounded-lg shadow text-center">
+      <h1 class="text-2xl font-bold text-teal-700">Signing you out…</h1>
+      <p class="mt-4 text-gray-600">
+        You will be redirected to the login page shortly.
+      </p>
+      <p class="mt-6">
+        <a
+          href="Login/index.html"
+          id="goLogin"
+          class="text-teal-600 underline"
+          data-i18n="back_dashboard"
+          >Go to login now</a
+        >
+      </p>
+    </div>
+
+    <script>
+      // Clear demo user and redirect
+      localStorage.removeItem("wh_user");
+      setTimeout(() => {
+        window.location.href = "Login/index.html";
+      }, 1200);
+    </script>
+  </body>
+</html>
+"}}]}] }

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>AI Chat - Mind Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/site.js"></script>
+    <script src="js/i18n.js"></script>
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      .chat-messages {
+        max-height: 60vh;
+        overflow-y: auto;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 min-h-screen">
+    <div class="max-w-4xl mx-auto p-6">
+      <div class="flex items-center gap-4 mb-6">
+        <img
+          src="https://placehold.co/48x48?text=MH"
+          alt="Mind Hub Logo"
+          class="rounded"
+        />
+        <h1
+          id="aiSiteTitle"
+          class="text-2xl font-extrabold"
+          data-i18n="site_name"
+        >
+          Mind Hub
+        </h1>
+        <a href="Dashboard.html" class="ml-auto text-sm text-teal-700"
+          >Back to Dashboard</a
+        >
+      </div>
+
+      <div class="bg-white rounded-lg shadow p-4">
+        <div class="flex items-center gap-2 mb-3">
+          <strong>AI Chat</strong>
+          <span id="aiMode" class="text-xs text-gray-500">Local</span>
+          <div class="ml-auto flex gap-2 items-center">
+            <label
+              class="text-xs flex items-center gap-2"
+              title="Allow the app to use remote LLMs"
+            >
+              <input type="checkbox" id="aiConsent" />
+              <span class="text-xs">Allow remote AI</span>
+            </label>
+            <select
+              id="aiModeSelect"
+              class="text-sm px-2 py-1 rounded bg-white border"
+            >
+              <option value="local">Local</option>
+              <option value="proxy">Server proxy</option>
+              <option value="openai">OpenAI (direct)</option>
+              <option value="gemini">Gemini (direct)</option>
+            </select>
+            <button
+              id="setOpenAIKey"
+              class="text-sm px-2 py-1 bg-gray-100 rounded"
+            >
+              Set OpenAI Key
+            </button>
+            <button
+              id="setGeminiKey"
+              class="text-sm px-2 py-1 bg-gray-100 rounded"
+            >
+              Set Gemini Key
+            </button>
+            <button
+              id="clearConversations"
+              class="text-sm px-2 py-1 bg-gray-100 rounded"
+            >
+              Clear
+            </button>
+            <button
+              id="exportConversations"
+              class="text-sm px-2 py-1 bg-gray-100 rounded"
+            >
+              Export
+            </button>
+          </div>
+        </div>
+
+        <div
+          id="chatMessages"
+          class="chat-messages space-y-3 p-2 border border-gray-100 rounded mb-3 bg-gray-50"
+        ></div>
+
+        <form id="chatForm" class="flex gap-2">
+          <input
+            id="chatInput"
+            type="text"
+            placeholder="Ask me about wellness, tips or Mind Hub..."
+            class="flex-grow border rounded px-3 py-2"
+            autocomplete="off"
+            required
+          />
+          <button
+            type="submit"
+            class="px-4 py-2 bg-teal-600 text-white rounded"
+          >
+            Send
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script src="js/ai-chat.js"></script>
+    <script>
+      // Ensure site title updates on change
+      (function () {
+        function update() {
+          var el = document.getElementById("aiSiteTitle");
+          var name =
+            (window.Site && Site.getName && Site.getName()) ||
+            window.SITE_NAME ||
+            "Mind Hub";
+          if (el) el.textContent = name;
+        }
+        update();
+        window.addEventListener("site:changed", update);
+        document.addEventListener("DOMContentLoaded", update);
+      })();
+      // Register root service worker for offline support (if available and secure)
+      (function () {
+        if (typeof navigator === "undefined" || !("serviceWorker" in navigator))
+          return;
+        const isFile = location.protocol === "file:";
+        const isLocalhost =
+          location.hostname === "localhost" ||
+          location.hostname === "127.0.0.1";
+        if (isFile)
+          return console.warn("Skipping SW registration: opened via file://");
+        if (!isLocalhost && location.protocol !== "https:")
+          return console.warn("Skipping SW registration: not secure context");
+        navigator.serviceWorker.register("/sw.js").catch(() => {});
+      })();
+    </script>
+  </body>
+</html>

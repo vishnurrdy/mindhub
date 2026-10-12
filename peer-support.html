@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Mind Hub - Peer Support</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/site.js"></script>
+    <script src="js/i18n.js"></script>
+    <style>
+      .posts {
+        max-height: 60vh;
+        overflow-y: auto;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 min-h-screen font-sans">
+    <div class="max-w-4xl mx-auto p-6">
+      <a
+        href="Dashboard.html"
+        class="text-teal-600 hover:underline"
+        data-i18n="back_dashboard"
+        >← Back to Dashboard</a
+      >
+      <h1 class="text-2xl font-bold mt-4" data-i18n="peer_support">Mind Hub</h1>
+      <p class="text-gray-600 mt-1">Community posts and discussions.</p>
+
+      <div class="mt-6 bg-white rounded-lg shadow p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <input
+            id="postText"
+            class="flex-grow rounded-md border-gray-200 px-3 py-2"
+            placeholder="Share something with the community..."
+            data-i18n-placeholder="post_placeholder"
+          />
+          <button
+            id="postBtn"
+            class="bg-teal-600 text-white px-4 py-2 rounded"
+            data-i18n="post"
+          >
+            Post
+          </button>
+        </div>
+
+        <div class="flex items-center gap-3 mb-4">
+          <button
+            id="reloadPosts"
+            class="text-sm px-3 py-1 rounded bg-gray-100 hover:bg-gray-200"
+            data-i18n="reload"
+          >
+            Reload
+          </button>
+          <button
+            id="exportPosts"
+            class="text-sm px-3 py-1 rounded bg-gray-100 hover:bg-gray-200"
+            data-i18n="export"
+          >
+            Export
+          </button>
+          <div class="ml-auto text-sm text-gray-500">Synced across tabs</div>
+        </div>
+
+        <div class="posts space-y-4" id="postsList">
+          <!-- Posts sync in real-time across tabs -->
+        </div>
+      </div>
+
+      <div class="mt-6 bg-white rounded-lg shadow p-6">
+        <h2 class="text-lg font-semibold mb-3" data-i18n="contacts">
+          Contacts
+        </h2>
+        <div class="flex gap-3 items-center mb-3">
+          <input
+            id="contactEmail"
+            placeholder="contact@example.com"
+            class="rounded border px-3 py-2 flex-grow"
+          />
+          <select id="contactType" class="rounded border px-2 py-2">
+            <option value="friend">Friend</option>
+            <option value="doctor">Doctor</option>
+          </select>
+          <button
+            id="addContact"
+            class="bg-gray-100 px-3 py-2 rounded"
+            data-i18n="add"
+          >
+            Add
+          </button>
+          <button
+            id="addSampleDoctor"
+            class="text-sm px-3 py-2 rounded bg-indigo-50 text-indigo-700"
+            data-i18n="add_sample_doctor"
+          >
+            Add sample doctor
+          </button>
+        </div>
+        <div id="contactsList" class="space-y-2 text-sm text-gray-700"></div>
+      </div>
+
+      <div class="mt-6 bg-white rounded-lg shadow p-6">
+        <h2 class="text-lg font-semibold mb-3">
+          Peer Circles (Anonymous Rooms)
+        </h2>
+        <p class="text-sm text-gray-500 mb-3">
+          Choose a themed room and join anonymously to chat with others in this
+          browser (syncs across tabs).
+        </p>
+
+        <div class="flex gap-3 mb-3">
+          <button
+            class="room-btn bg-gray-100 px-3 py-2 rounded"
+            data-room="late-night"
+          >
+            Late-night talk
+          </button>
+          <button
+            class="room-btn bg-gray-100 px-3 py-2 rounded"
+            data-room="exam-warriors"
+          >
+            Exam Warriors
+          </button>
+          <button
+            class="room-btn bg-gray-100 px-3 py-2 rounded"
+            data-room="meme-therapy"
+          >
+            Meme therapy
+          </button>
+          <button
+            id="roomCreate"
+            class="ml-auto text-sm px-3 py-2 bg-indigo-50 text-indigo-700 rounded"
+          >
+            Create room
+          </button>
+        </div>
+
+        <div id="peerCirclePanel" class="border rounded p-3 hidden">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="text-sm font-medium">Room:</div>
+            <div id="activeRoom" class="font-semibold"></div>
+            <div class="ml-auto text-xs text-gray-500">You are anonymous</div>
+          </div>
+          <div
+            id="circlePosts"
+            class="posts bg-gray-50 p-2 rounded mb-2"
+            style="min-height: 120px"
+          ></div>
+          <div class="flex gap-2">
+            <input
+              id="circleInput"
+              class="flex-grow rounded border px-3 py-2"
+              placeholder="Say something to the room..."
+            />
+            <button
+              id="circleSend"
+              class="bg-teal-600 text-white px-3 py-2 rounded"
+            >
+              Send
+            </button>
+            <button id="circleLeave" class="bg-gray-100 px-3 py-2 rounded">
+              Leave
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 bg-white rounded-lg shadow p-6">
+        <h2 class="text-lg font-semibold mb-3">Comments & Quotes</h2>
+        <p class="text-sm text-gray-500 mb-4">
+          A few supportive notes from friends and short guidance quotes from
+          clinicians (examples).
+        </p>
+
+        <div class="space-y-4">
+          <blockquote class="p-4 border-l-4 border-teal-500 bg-teal-50 rounded">
+            <p class="text-gray-800">
+              "If you're feeling low, try a simple 4-4-4 breathing: breathe in
+              for 4, hold 4, out for 4. Repeat for a minute to calm your nervous
+              system."
+            </p>
+            <footer class="mt-2 text-sm text-gray-600">— Friend</footer>
+          </blockquote>
+
+          <blockquote
+            class="p-4 border-l-4 border-indigo-500 bg-indigo-50 rounded"
+          >
+            <p class="text-gray-800">
+              "Grounding exercise: name 5 things you can see, 4 you can touch, 3
+              you can hear, 2 you can smell, 1 you can taste. Do it slowly and
+              notice the body."
+            </p>
+            <footer class="mt-2 text-sm text-gray-600">— Peer Support</footer>
+          </blockquote>
+
+          <blockquote class="p-4 border-l-4 border-gray-300 bg-white rounded">
+            <p class="text-gray-800">
+              "Progressive Muscle Relaxation (PMR): tense each muscle group for
+              5 seconds then release, moving from toes up to your face. It can
+              reduce anxiety and tension."
+            </p>
+            <footer class="mt-2 text-sm text-gray-600">— Clinician tip</footer>
+          </blockquote>
+
+          <blockquote class="p-4 border-l-4 border-gray-300 bg-white rounded">
+            <p class="text-gray-800">
+              "Try a short guided imagery: imagine a safe peaceful place, notice
+              colors, sounds, textures. Spend 2–3 minutes there when stress
+              spikes."
+            </p>
+            <footer class="mt-2 text-sm text-gray-600">
+              — Therapist suggestion
+            </footer>
+          </blockquote>
+        </div>
+      </div>
+
+      <!-- PM Modal -->
+      <div
+        id="pmModal"
+        class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center"
+      >
+        <div class="bg-white rounded-lg p-4 w-full max-w-xl">
+          <div class="flex justify-between items-center mb-3">
+            <h3 class="font-semibold" data-i18n="peer_support">
+              Send Private Message
+            </h3>
+            <button id="closePm" class="text-gray-500">✕</button>
+          </div>
+          <div class="mb-2 text-sm text-gray-600">
+            To: <span id="pmTo"></span>
+          </div>
+          <textarea
+            id="pmText"
+            class="w-full border rounded p-2"
+            rows="4"
+            placeholder="Write your private message..."
+          ></textarea>
+          <div class="mt-3 text-right">
+            <button
+              id="sendPm"
+              class="bg-teal-600 text-white px-4 py-2 rounded"
+              data-i18n="send_pm"
+            >
+              Send
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <script src="js/comm.js"></script>
+      <script src="js/peer-circles.js"></script>
+    </div>
+
+    <script>
+      // Redirect to login if no signed-in user
+      (function () {
+        if (!localStorage.getItem("wh_user")) {
+          window.location.href = "Login/index.html";
+        }
+      })();
+
+      // WHComm-backed peer support posting (real-time across tabs with local fallback)
+      (function () {
+        const postsList = document.getElementById("postsList");
+        const postBtn = document.getElementById("postBtn");
+        const postText = document.getElementById("postText");
+        const reloadBtn = document.getElementById("reloadPosts");
+        const exportBtn = document.getElementById("exportPosts");
+        const postsKey = "wh_posts_demo";
+        const user =
+          localStorage.getItem("wh_user") ||
+          (window.SITE_SLUG
+            ? "guest@" + window.SITE_SLUG + ".example"
+            : "guest@mindhub.example");
+
+        function escapeHtml(s) {
+          return String(s).replace(/[&<>\"']/g, function (c) {
+            return {
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            }[c];
+          });
+        }
+
+        function renderPost(p) {
+          const el = document.createElement("div");
+          el.className = "p-3 border rounded";
+          el.innerHTML = `\n        <div class="text-sm text-gray-600">${escapeHtml(
+            p.user
+          )} · <span class="text-xs text-gray-400">${new Date(
+            p.ts
+          ).toLocaleString()}</span></div>\n        <div class="mt-1 text-gray-800">${escapeHtml(
+            p.text
+          )}</div>\n      `;
+          postsList.prepend(el);
+        }
+
+        function saveLocalPosts(posts) {
+          try {
+            localStorage.setItem(postsKey, JSON.stringify(posts));
+          } catch (e) {}
+        }
+        function loadLocalPosts() {
+          try {
+            return JSON.parse(localStorage.getItem(postsKey) || "[]");
+          } catch (e) {
+            return [];
+          }
+        }
+
+        if (window.WHComm) {
+          // hydrate from WHComm history
+          const hist = WHComm.history() || [];
+          if (hist.length) {
+            hist.forEach((m) => {
+              if (m && m.type === "post" && m.payload) renderPost(m.payload);
+            });
+          } else {
+            // fallback to local posts if WHComm has no history
+            loadLocalPosts().reverse().forEach(renderPost);
+          }
+
+          WHComm.on("post", (payload) => {
+            const lp = loadLocalPosts();
+            lp.push(payload);
+            saveLocalPosts(lp);
+            renderPost(payload);
+          });
+
+          postBtn.addEventListener("click", () => {
+            const text = postText.value.trim();
+            if (!text) return;
+            const payload = {
+              user: user,
+              text: text,
+              ts: Date.now(),
+              id: "p_" + Math.random().toString(36).slice(2, 9),
+            };
+            WHComm.emit("post", payload, { persist: true });
+            postText.value = "";
+          });
+
+          reloadBtn.addEventListener("click", () => {
+            postsList.innerHTML = "";
+            (WHComm.history() || []).forEach((m) => {
+              if (m.type === "post") renderPost(m.payload);
+            });
+          });
+
+          exportBtn.addEventListener("click", () => {
+            const data = JSON.stringify(
+              (WHComm.history() || [])
+                .filter((m) => m.type === "post")
+                .map((m) => m.payload),
+              null,
+              2
+            );
+            const blob = new Blob([data], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = (window.SITE_SLUG || "mindhub") + "_posts.json";
+            a.click();
+            URL.revokeObjectURL(url);
+          });
+        } else {
+          // local-only mode
+          const posts = loadLocalPosts();
+          posts.reverse().forEach(renderPost);
+
+          postBtn.addEventListener("click", () => {
+            const text = postText.value.trim();
+            if (!text) return;
+            const payload = {
+              user: user,
+              text: text,
+              ts: Date.now(),
+              id: "p_" + Math.random().toString(36).slice(2, 9),
+            };
+            posts.push(payload);
+            saveLocalPosts(posts);
+            renderPost(payload);
+            postText.value = "";
+          });
+
+          reloadBtn.addEventListener("click", () => {
+            postsList.innerHTML = "";
+            loadLocalPosts().reverse().forEach(renderPost);
+          });
+
+          exportBtn.addEventListener("click", () => {
+            const data = JSON.stringify(loadLocalPosts(), null, 2);
+            const blob = new Blob([data], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = (window.SITE_SLUG || "mindhub") + "_posts.json";
+            a.click();
+            URL.revokeObjectURL(url);
+          });
+        }
+      })();
+    </script>
+    <script>
+      // Comments, Contacts and Private Messages (PM) integration
+      (function () {
+        const contactsKey = "wh_contacts";
+        const commentsKey = "wh_comments";
+        const pmsKey = "wh_pms";
+        const user = localStorage.getItem("wh_user") || "guest@mindhub.example";
+
+        function loadJSON(k) {
+          try {
+            return JSON.parse(localStorage.getItem(k) || "[]");
+          } catch (e) {
+            return [];
+          }
+        }
+        function saveJSON(k, v) {
+          try {
+            localStorage.setItem(k, JSON.stringify(v));
+          } catch (e) {}
+        }
+
+        // Contacts
+        const contactEmail = document.getElementById("contactEmail");
+        const addContact = document.getElementById("addContact");
+        const contactsList = document.getElementById("contactsList");
+
+        function renderContacts() {
+          const contacts = loadJSON(contactsKey);
+          contactsList.innerHTML = "";
+          contacts.forEach((c) => {
+            const el = document.createElement("div");
+            el.className =
+              "flex items-center justify-between p-2 border rounded";
+            el.innerHTML = `<div><strong class="text-teal-700">${
+              c.email
+            }</strong><div class="text-xs text-gray-500">${
+              c.known ? "Known" : "Unknown"
+            }</div></div><div class=\"flex gap-2\"><button class=\"pmBtn text-sm px-2 py-1 bg-teal-600 text-white rounded\">PM</button><button class=\"rmBtn text-sm px-2 py-1 bg-gray-100 rounded\">Remove</button></div>`;
+            const pmBtn = el.querySelector(".pmBtn");
+            const rmBtn = el.querySelector(".rmBtn");
+            pmBtn.addEventListener("click", () => openPmModal(c.email));
+            rmBtn.addEventListener("click", () => {
+              removeContact(c.email);
+              renderContacts();
+            });
+            contactsList.appendChild(el);
+          });
+        }
+
+        function addContactEmail(email) {
+          if (!email) return;
+          const contacts = loadJSON(contactsKey);
+          if (contacts.find((x) => x.email === email)) return;
+          contacts.push({ email: email, known: true, addedAt: Date.now() });
+          saveJSON(contactsKey, contacts);
+          renderContacts();
+        }
+
+        function removeContact(email) {
+          let contacts = loadJSON(contactsKey);
+          contacts = contacts.filter((c) => c.email !== email);
+          saveJSON(contactsKey, contacts);
+        }
+
+        addContact.addEventListener("click", () => {
+          const e = contactEmail.value.trim();
+          if (!e) return;
+          addContactEmail(e);
+          contactEmail.value = "";
+        });
+        renderContacts();
+
+        // Comments
+        function renderComment(c) {
+          const el = document.createElement("div");
+          el.className = "mt-2 ml-4 text-sm text-gray-700";
+          el.innerHTML = `<div class=\"text-xs text-gray-500\">${new Date(
+            c.ts
+          ).toLocaleString()} · ${c.user}</div><div>${escapeHtml(
+            c.text
+          )}</div>`;
+          return el;
+        }
+
+        // Attach comment UI to each post when rendering
+        const originalRenderPost = window.renderPost;
+        window.renderPost = function (p) {
+          // call existing render
+          originalRenderPost(p);
+          try {
+            // find the rendered post (first child)
+            const first = document.querySelector("#postsList > div");
+            if (!first) return;
+            // comment area
+            const cArea = document.createElement("div");
+            cArea.className = "mt-3 border-t pt-3";
+            cArea.innerHTML = `<div class=\"flex gap-2\"><input placeholder=\"Write a comment...\" class=\"flex-grow rounded border px-2 py-1 commentInput\" /><button class=\"commentBtn bg-gray-100 px-2 py-1 rounded text-sm\">Comment</button></div><div class=\"commentsList mt-2\"></div>`;
+            const commentInput = cArea.querySelector(".commentInput");
+            const commentBtn = cArea.querySelector(".commentBtn");
+            const commentsList = cArea.querySelector(".commentsList");
+
+            // load existing comments for post
+            const allComments = loadJSON(commentsKey);
+            const postComments = allComments.filter((c) => c.postId === p.id);
+            postComments.forEach((c) =>
+              commentsList.appendChild(renderComment(c))
+            );
+
+            commentBtn.addEventListener("click", () => {
+              const txt = commentInput.value.trim();
+              if (!txt) return;
+              const comment = {
+                id: "c_" + Math.random().toString(36).slice(2, 8),
+                postId: p.id,
+                user: user,
+                text: txt,
+                ts: Date.now(),
+              };
+              // save locally
+              const ac = loadJSON(commentsKey);
+              ac.push(comment);
+              saveJSON(commentsKey, ac);
+              // emit via WHComm
+              if (window.WHComm)
+                WHComm.emit("comment", comment, { persist: false });
+              commentsList.appendChild(renderComment(comment));
+              commentInput.value = "";
+            });
+
+            first.appendChild(cArea);
+          } catch (e) {
+            console.warn("comment attach failed", e);
+          }
+        };
+
+        // Listen for comments from WHComm
+        if (window.WHComm) {
+          WHComm.on("comment", (comment) => {
+            // persist
+            const ac = loadJSON(commentsKey);
+            ac.push(comment);
+            saveJSON(commentsKey, ac);
+            // try to find post's commentsList and append
+            const posts = document.querySelectorAll("#postsList > div");
+            for (const postEl of posts) {
+              if (postEl.innerText.includes(comment.postId)) {
+                const cl = postEl.querySelector(".commentsList");
+                if (cl) cl.appendChild(renderComment(comment));
+              }
+            }
+          });
+        }
+
+        // PM modal handling
+        const pmModal = document.getElementById("pmModal");
+        const pmTo = document.getElementById("pmTo");
+        const pmText = document.getElementById("pmText");
+        const sendPm = document.getElementById("sendPm");
+        const closePm = document.getElementById("closePm");
+
+        function openPmModal(email) {
+          pmTo.innerText = email;
+          pmModal.classList.remove("hidden");
+          pmModal.classList.add("flex");
+        }
+        function closePmModal() {
+          pmModal.classList.add("hidden");
+          pmModal.classList.remove("flex");
+          pmText.value = "";
+          pmTo.innerText = "";
+        }
+        closePm.addEventListener("click", closePmModal);
+
+        sendPm.addEventListener("click", () => {
+          const to = pmTo.innerText;
+          const text = pmText.value.trim();
+          if (!to || !text) return;
+          const pm = {
+            id: "pm_" + Math.random().toString(36).slice(2, 9),
+            from: user,
+            to: to,
+            text: text,
+            ts: Date.now(),
+          };
+          // save locally
+          const all = loadJSON(pmsKey);
+          all.push(pm);
+          saveJSON(pmsKey, all);
+          // emit
+          if (window.WHComm) WHComm.emit("pm", pm, { persist: false });
+          closePmModal();
+          alert("Private message sent to " + to + " (demo local-only)");
+        });
+
+        // Handle incoming PMs
+        if (window.WHComm) {
+          WHComm.on("pm", (pm) => {
+            // Save if it's to me
+            if (pm.to === user) {
+              const all = loadJSON(pmsKey);
+              all.push(pm);
+              saveJSON(pmsKey, all);
+              try {
+                if (window.showNotification) {
+                  new Notification("New message from " + pm.from, {
+                    body: pm.text,
+                  });
+                }
+              } catch (e) {}
+            }
+          });
+        }
+
+        // helper: escapeHtml used above
+        function escapeHtml(s) {
+          return String(s).replace(/[&<>\"']/g, function (c) {
+            return {
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            }[c];
+          });
+        }
+      })();
+    </script>
+  </body>
+</html>

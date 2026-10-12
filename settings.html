@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Mind Hub - Settings</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/site.js"></script>
+  </head>
+  <body class="bg-gray-100 min-h-screen font-sans">
+    <div class="max-w-3xl mx-auto p-6">
+      <a
+        href="Dashboard.html"
+        class="text-teal-600 hover:underline"
+        data-i18n="back_dashboard"
+        >← Back to Dashboard</a
+      >
+      <h1 class="text-2xl font-bold mt-4" data-i18n="site_name">Mind Hub</h1>
+      <p class="text-gray-600 mt-1">
+        Customize your Mind Hub experience (demo).
+      </p>
+
+      <!-- Site name editor -->
+      <div class="mt-4 bg-white p-4 rounded shadow">
+        <label class="block text-sm font-medium mb-2">Site name</label>
+        <div class="flex gap-2">
+          <input
+            id="siteNameInput"
+            class="flex-grow rounded border px-3 py-2"
+            placeholder="Site name (e.g. Mind Hub)"
+          />
+          <button
+            id="saveSiteName"
+            class="bg-teal-600 text-white px-4 py-2 rounded"
+          >
+            Save
+          </button>
+        </div>
+        <div class="text-xs text-gray-500 mt-2">
+          Change the visible site name. This is stored locally.
+        </div>
+      </div>
+
+      <div class="mt-6 bg-white rounded-lg shadow p-6 space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="font-medium">Dark mode</div>
+            <div class="text-sm text-gray-500">
+              Toggle a simple dark theme (client-side)
+            </div>
+          </div>
+          <label class="inline-flex items-center">
+            <input
+              id="darkToggle"
+              type="checkbox"
+              class="form-checkbox h-5 w-5 text-teal-600"
+            />
+          </label>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="font-medium">Notifications</div>
+            <div class="text-sm text-gray-500">Enable demo notifications</div>
+          </div>
+          <label class="inline-flex items-center">
+            <input
+              id="notifToggle"
+              type="checkbox"
+              class="form-checkbox h-5 w-5 text-teal-600"
+              checked
+            />
+          </label>
+        </div>
+
+        <div>
+          <button
+            id="saveSettings"
+            class="bg-teal-600 text-white px-4 py-2 rounded"
+          >
+            Save Settings
+          </button>
+          <span id="smsg" class="ml-3 text-sm"></span>
+        </div>
+      </div>
+
+      <!-- Account & Security -->
+      <div class="mt-6 bg-white rounded-lg shadow p-6 space-y-4">
+        <h2 class="text-lg font-semibold">Account & Security</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium">Language</label>
+            <select
+              id="langSelect"
+              class="mt-1 block w-full rounded border px-3 py-2"
+            >
+              <option value="en">English</option>
+              <option value="hi">हिन्दी</option>
+              <option value="te">తెలుగు</option>
+            </select>
+            <div class="text-xs text-gray-500 mt-1">
+              Language selection is client-side demo only.
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium"
+              >Two-factor (2FA) - Demo</label
+            >
+            <div class="flex items-center gap-3 mt-1">
+              <label class="inline-flex items-center"
+                ><input
+                  id="twofaToggle"
+                  type="checkbox"
+                  class="form-checkbox h-5 w-5 text-teal-600"
+                />
+                <span class="ml-2 text-sm"
+                  >Enable 2FA (placeholder)</span
+                ></label
+              >
+            </div>
+            <div class="text-xs text-gray-500 mt-1">
+              This is a UI placeholder for 2FA. No real challenge is performed
+              in demo.
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium">Swap Account</label>
+            <select
+              id="swapAccount"
+              class="mt-1 block w-full rounded border px-3 py-2"
+            ></select>
+            <div class="text-xs text-gray-500 mt-1">
+              Switch between demo accounts stored locally.
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium">Delete Account</label>
+            <div class="flex gap-2 mt-1">
+              <input
+                id="delConfirm"
+                placeholder="type DELETE to confirm"
+                class="flex-grow rounded border px-3 py-2"
+              />
+              <button id="deleteAccount" class="bg-red-100 px-3 py-2 rounded">
+                Delete
+              </button>
+            </div>
+            <div class="text-xs text-gray-500 mt-1">
+              This removes account data from localStorage (demo). Not
+              reversible.
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3">
+          <h3 class="font-medium">Change Password</h3>
+          <div class="flex gap-2 mt-2">
+            <input
+              id="oldPw"
+              type="password"
+              placeholder="Current password"
+              class="rounded border px-3 py-2 flex-grow"
+            />
+            <input
+              id="newPw"
+              type="password"
+              placeholder="New password"
+              class="rounded border px-3 py-2 flex-grow"
+            />
+            <button
+              id="changePw"
+              class="bg-teal-600 text-white px-3 py-2 rounded"
+            >
+              Change
+            </button>
+          </div>
+          <div id="pwMsg" class="text-xs text-gray-500 mt-2"></div>
+        </div>
+
+        <div class="mt-3">
+          <h3 class="font-medium">Security Logs</h3>
+          <div
+            id="secLogs"
+            class="mt-2 text-sm text-gray-700 max-h-40 overflow-auto"
+          ></div>
+          <div class="mt-2">
+            <button id="clearLogs" class="bg-gray-50 px-3 py-2 rounded">
+              Clear Logs
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Casual settings -->
+      <div class="mt-6 bg-white rounded-lg shadow p-6 space-y-4">
+        <h2 class="text-lg font-semibold">Casual Settings</h2>
+        <p class="text-sm text-gray-500">
+          Quick, friendly options to personalize your Mind Hub experience.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium">Accent color</label>
+            <select
+              id="accentSelect"
+              class="mt-1 block w-full rounded border px-3 py-2"
+            >
+              <option value="teal">Teal</option>
+              <option value="blue">Blue</option>
+              <option value="purple">Purple</option>
+              <option value="pink">Pink</option>
+              <option value="orange">Orange</option>
+            </select>
+            <div class="text-xs text-gray-500 mt-1">
+              Choose a friendly accent color for buttons and highlights.
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium">Font size</label>
+            <select
+              id="fontSelect"
+              class="mt-1 block w-full rounded border px-3 py-2"
+            >
+              <option value="small">Small</option>
+              <option value="normal">Normal</option>
+              <option value="large">Large</option>
+            </select>
+            <div class="text-xs text-gray-500 mt-1">
+              Adjust the base font size for comfortable reading.
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium">Privacy mode</label>
+            <div class="flex items-center justify-between mt-1">
+              <div class="text-sm text-gray-500">
+                Hide activity previews and sensitive hints
+              </div>
+              <label class="inline-flex items-center">
+                <input
+                  id="privacyToggle"
+                  type="checkbox"
+                  class="form-checkbox h-5 w-5 text-teal-600"
+                />
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium">Autoplay media</label>
+            <div class="flex items-center justify-between mt-1">
+              <div class="text-sm text-gray-500">
+                Automatically play short guided clips
+              </div>
+              <label class="inline-flex items-center">
+                <input
+                  id="autoplayToggle"
+                  type="checkbox"
+                  class="form-checkbox h-5 w-5 text-teal-600"
+                />
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium">Daily reminder</label>
+            <div class="flex items-center gap-2 mt-1">
+              <label class="inline-flex items-center">
+                <input
+                  id="reminderToggle"
+                  type="checkbox"
+                  class="form-checkbox h-5 w-5 text-teal-600"
+                />
+                <span class="ml-2 text-sm">Enable</span>
+              </label>
+              <input
+                id="reminderTime"
+                type="time"
+                class="ml-2 rounded border px-3 py-2"
+              />
+            </div>
+            <div class="text-xs text-gray-500 mt-1">
+              A gentle daily nudge to check in (demo, uses Notification
+              permission if granted).
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium">Compact layout</label>
+            <div class="flex items-center justify-between mt-1">
+              <div class="text-sm text-gray-500">
+                Use a tighter, compact UI density
+              </div>
+              <label class="inline-flex items-center">
+                <input
+                  id="compactToggle"
+                  type="checkbox"
+                  class="form-checkbox h-5 w-5 text-teal-600"
+                />
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Populate site-name input and wire save
+      (function () {
+        try {
+          const input = document.getElementById("siteNameInput");
+          const saveBtn = document.getElementById("saveSiteName");
+          const h1 = document.querySelector("[data-i18n=site_name]");
+          if (window.Site && typeof window.Site.getName === "function") {
+            input.value = window.Site.getName();
+          }
+          saveBtn.addEventListener("click", () => {
+            const v = (input.value || "").trim();
+            if (!v) {
+              alert("Please enter a site name.");
+              return;
+            }
+            const name = window.Site.setName(v);
+            if (h1) h1.textContent = name;
+            // also update any visible sidebarTitle if present
+            const st = document.getElementById("sidebarTitle");
+            if (st) st.textContent = name;
+            const sm = document.getElementById("smsg");
+            if (sm) {
+              sm.textContent = "Site name saved.";
+              sm.className = "ml-3 text-sm text-green-600";
+              setTimeout(() => (sm.textContent = ""), 2000);
+            }
+          });
+
+          // Listen to site:changed to update UI elsewhere
+          window.addEventListener("site:changed", (e) => {
+            const name = (e && e.detail && e.detail.name) || window.SITE_NAME;
+            if (h1) h1.textContent = name;
+            const st = document.getElementById("sidebarTitle");
+            if (st) st.textContent = name;
+          });
+        } catch (e) {
+          console.warn(e);
+        }
+      })();
+      // load lightweight i18n helper if present
+      (function () {
+        const s = document.createElement("script");
+        s.src = "js/i18n.js";
+        s.async = false;
+        document.head.appendChild(s);
+      })();
+      // Redirect to login if not authenticated
+      (function () {
+        if (!localStorage.getItem("wh_user")) {
+          window.location.href = "Login/index.html";
+        }
+      })();
+
+      const darkToggle = document.getElementById("darkToggle");
+      const notifToggle = document.getElementById("notifToggle");
+      const saveSettings = document.getElementById("saveSettings");
+      const smsg = document.getElementById("smsg");
+
+      // Load
+      const settings = JSON.parse(localStorage.getItem("wh_settings") || "{}");
+      if (settings.dark) {
+        document.body.classList.add("bg-gray-900", "text-white");
+        darkToggle.checked = true;
+      }
+      if (settings.notif === false) notifToggle.checked = false;
+
+      saveSettings.addEventListener("click", () => {
+        const s = { dark: darkToggle.checked, notif: notifToggle.checked };
+        localStorage.setItem("wh_settings", JSON.stringify(s));
+        smsg.textContent = "Settings saved (demo).";
+        smsg.className = "ml-3 text-sm text-green-600";
+        setTimeout(() => (smsg.textContent = ""), 2000);
+      });
+    </script>
+
+    <script>
+      // Casual settings - load/save and apply
+      (function () {
+        const accentSelect = document.getElementById("accentSelect");
+        const fontSelect = document.getElementById("fontSelect");
+        const privacyToggle = document.getElementById("privacyToggle");
+        const autoplayToggle = document.getElementById("autoplayToggle");
+        const reminderToggle = document.getElementById("reminderToggle");
+        const reminderTime = document.getElementById("reminderTime");
+        const compactToggle = document.getElementById("compactToggle");
+
+        // Read casual settings from main settings and apply
+        const s = JSON.parse(localStorage.getItem("wh_settings") || "{}");
+        // Defaults
+        const casual = s.casual || {
+          accent: "teal",
+          font: "normal",
+          privacy: false,
+          autoplay: false,
+          reminder: { enabled: false, time: "09:00" },
+          compact: false,
+        };
+
+        // Populate UI
+        accentSelect.value = casual.accent || "teal";
+        fontSelect.value = casual.font || "normal";
+        privacyToggle.checked = !!casual.privacy;
+        autoplayToggle.checked = !!casual.autoplay;
+        reminderToggle.checked = !!(casual.reminder && casual.reminder.enabled);
+        reminderTime.value =
+          (casual.reminder && casual.reminder.time) || "09:00";
+        compactToggle.checked = !!casual.compact;
+
+        // Apply visual choices
+        function applyAccent(a) {
+          // Simple accent application by setting a data-attr on body for CSS hooks
+          document.body.dataset.accent = a;
+        }
+        function applyFont(f) {
+          if (f === "small") document.documentElement.style.fontSize = "14px";
+          else if (f === "large")
+            document.documentElement.style.fontSize = "18px";
+          else document.documentElement.style.fontSize = "16px";
+        }
+        function applyCompact(c) {
+          if (c) document.body.classList.add("compact-ui");
+          else document.body.classList.remove("compact-ui");
+        }
+
+        applyAccent(casual.accent);
+        applyFont(casual.font);
+        applyCompact(casual.compact);
+
+        // Hook reminder: schedule a simple in-page timer (demo) that will fire a Notification if permission granted.
+        let reminderTimer = null;
+        function scheduleReminder(enabled, timeStr) {
+          if (reminderTimer) {
+            clearTimeout(reminderTimer);
+            reminderTimer = null;
+          }
+          if (!enabled) return;
+          // compute ms until next occurrence of timeStr (HH:MM)
+          const [hh, mm] = (timeStr || "09:00").split(":").map(Number);
+          const now = new Date();
+          const target = new Date(now);
+          target.setHours(hh, mm, 0, 0);
+          if (target <= now) target.setDate(target.getDate() + 1);
+          const delay = target - now;
+          reminderTimer = setTimeout(async () => {
+            if (Notification.permission === "granted") {
+              new Notification((window.SITE_NAME || "Mind Hub") + " Reminder", {
+                body: "Time for a short check-in. Take a breath.",
+              });
+            }
+            // schedule next day
+            scheduleReminder(true, timeStr);
+          }, delay);
+        }
+
+        scheduleReminder(reminderToggle.checked, reminderTime.value);
+
+        // Save behavior: extend existing saveSettings listener
+        const saveBtn = document.getElementById("saveSettings");
+        saveBtn.addEventListener("click", () => {
+          const base =
+            JSON.parse(localStorage.getItem("wh_settings") || "{}") || {};
+          base.dark = document.getElementById("darkToggle").checked;
+          base.notif = document.getElementById("notifToggle").checked;
+          base.casual = {
+            accent: accentSelect.value,
+            font: fontSelect.value,
+            privacy: privacyToggle.checked,
+            autoplay: autoplayToggle.checked,
+            reminder: {
+              enabled: reminderToggle.checked,
+              time: reminderTime.value,
+            },
+            compact: compactToggle.checked,
+          };
+          localStorage.setItem("wh_settings", JSON.stringify(base));
+          // apply immediately
+          applyAccent(base.casual.accent);
+          applyFont(base.casual.font);
+          applyCompact(base.casual.compact);
+          scheduleReminder(
+            base.casual.reminder.enabled,
+            base.casual.reminder.time
+          );
+          const sm = document.getElementById("smsg");
+          sm.textContent = "Settings saved (demo).";
+          sm.className = "ml-3 text-sm text-green-600";
+          setTimeout(() => (sm.textContent = ""), 2000);
+        });
+
+        // Also allow reminder toggles to update scheduling live
+        reminderToggle.addEventListener("change", () =>
+          scheduleReminder(reminderToggle.checked, reminderTime.value)
+        );
+        reminderTime.addEventListener("change", () =>
+          scheduleReminder(reminderToggle.checked, reminderTime.value)
+        );
+      })();
+    </script>
+
+    <script>
+      // Account & Security behaviors
+      (function () {
+        const langSelect = document.getElementById("langSelect");
+        const twofaToggle = document.getElementById("twofaToggle");
+        const swapAccount = document.getElementById("swapAccount");
+        const deleteAccount = document.getElementById("deleteAccount");
+        const delConfirm = document.getElementById("delConfirm");
+        const oldPw = document.getElementById("oldPw");
+        const newPw = document.getElementById("newPw");
+        const changePw = document.getElementById("changePw");
+        const pwMsg = document.getElementById("pwMsg");
+        const secLogs = document.getElementById("secLogs");
+        const clearLogs = document.getElementById("clearLogs");
+
+        const ACC_KEY = "wh_accounts"; // list of local demo accounts
+        const PROFILE_PREFIX = "wh_profile_";
+        const PW_META_PREFIX = "wh_pwmeta_";
+        const SEC_LOGS = "wh_security_logs";
+
+        function getCurrentUser() {
+          return localStorage.getItem("wh_user");
+        }
+        function addLog(msg) {
+          const logs = JSON.parse(localStorage.getItem(SEC_LOGS) || "[]");
+          logs.unshift({ ts: Date.now(), msg });
+          localStorage.setItem(SEC_LOGS, JSON.stringify(logs));
+          renderLogs();
+        }
+
+        // Language selection (limited to English, Hindi, Telugu)
+        const storedLang = localStorage.getItem("wh_lang") || "en";
+        langSelect.value = storedLang;
+        // set document language for assistive tech and any runtime checks
+        document.documentElement.lang = storedLang;
+        langSelect.addEventListener("change", () => {
+          const v = langSelect.value;
+          localStorage.setItem("wh_lang", v);
+          document.documentElement.lang = v;
+          addLog("Language set to " + v);
+          // reload to allow other pages/scripts to pick up the new language setting
+          alert(
+            "Language set (demo). The page will reload to apply the change."
+          );
+          location.reload();
+        });
+
+        // 2FA placeholder
+        twofaToggle.checked = localStorage.getItem("wh_2fa") === "1";
+        twofaToggle.addEventListener("change", () => {
+          localStorage.setItem("wh_2fa", twofaToggle.checked ? "1" : "0");
+          addLog("2FA " + (twofaToggle.checked ? "enabled" : "disabled"));
+          alert("2FA setting updated (demo).");
+        });
+
+        // Swap account: populate from ACC_KEY
+        function loadAccounts() {
+          try {
+            return JSON.parse(localStorage.getItem(ACC_KEY) || "[]");
+          } catch (e) {
+            return [];
+          }
+        }
+        function saveAccounts(a) {
+          localStorage.setItem(ACC_KEY, JSON.stringify(a));
+        }
+
+        function renderAccounts() {
+          const a = loadAccounts();
+          swapAccount.innerHTML = "";
+          a.forEach((acc) => {
+            const opt = document.createElement("option");
+            opt.value = acc.email;
+            opt.textContent = acc.email;
+            swapAccount.appendChild(opt);
+          });
+          // add own user if missing
+          const me = getCurrentUser();
+          if (me && !a.find((x) => x.email === me)) {
+            const opt = document.createElement("option");
+            opt.value = me;
+            opt.textContent = me;
+            swapAccount.appendChild(opt);
+          }
+        }
+
+        swapAccount.addEventListener("change", () => {
+          const val = swapAccount.value;
+          if (!val) return;
+          localStorage.setItem("wh_user", val);
+          addLog("Switched to account " + val);
+          alert("Switched account to " + val + " (demo).");
+          location.reload();
+        });
+        renderAccounts();
+
+        // Delete account (demo): removes profile and pwmeta and from accounts list
+        deleteAccount.addEventListener("click", () => {
+          const cur = getCurrentUser();
+          if (!cur) {
+            alert("No signed-in user");
+            return;
+          }
+          if (delConfirm.value !== "DELETE") {
+            alert("Type DELETE to confirm");
+            return;
+          }
+          // remove profile and pwmeta
+          localStorage.removeItem(PROFILE_PREFIX + cur);
+          localStorage.removeItem(PW_META_PREFIX + cur);
+          // remove from accounts list
+          const accs = loadAccounts().filter((a) => a.email !== cur);
+          saveAccounts(accs);
+          addLog("Account deleted: " + cur);
+          // clear wh_user and reload to login
+          localStorage.removeItem("wh_user");
+          alert("Account deleted (demo). Redirecting to login.");
+          window.location.href = "Login/index.html";
+        });
+
+        // Change password (demo-only): update pw meta and store a light hash in pwmeta
+        function lightHash(s) {
+          let h = 0;
+          for (let i = 0; i < s.length; i++) {
+            h = (h << 5) - h + s.charCodeAt(i);
+            h |= 0;
+          }
+          return h.toString(36);
+        }
+        changePw.addEventListener("click", () => {
+          const cur = getCurrentUser();
+          if (!cur) {
+            pwMsg.textContent = "Not signed in";
+            return;
+          }
+          const prof = JSON.parse(
+            localStorage.getItem(PROFILE_PREFIX + cur) || "{}"
+          );
+          const pwmeta = JSON.parse(
+            localStorage.getItem(PW_META_PREFIX + cur) || "[]"
+          );
+          const old = oldPw.value || "";
+          const nw = newPw.value || "";
+          if (!nw || nw.length < 6) {
+            pwMsg.textContent = "New password must be 6+ chars";
+            return;
+          }
+          // Check old matches last password hash if exists (demo)
+          const last = pwmeta.length ? pwmeta[pwmeta.length - 1].hash : null;
+          if (last && lightHash(old) !== last) {
+            pwMsg.textContent = "Current password incorrect";
+            return;
+          }
+          // update
+          pwmeta.push({ ts: Date.now(), hash: lightHash(nw) });
+          localStorage.setItem(PW_META_PREFIX + cur, JSON.stringify(pwmeta));
+          addLog("Password changed for " + cur);
+          pwMsg.textContent = "Password changed (demo).";
+          oldPw.value = "";
+          newPw.value = "";
+          setTimeout(() => (pwMsg.textContent = ""), 3000);
+        });
+
+        // Security logs
+        function renderLogs() {
+          const logs = JSON.parse(localStorage.getItem(SEC_LOGS) || "[]");
+          secLogs.innerHTML = "";
+          logs.forEach((l) => {
+            const el = document.createElement("div");
+            el.className = "p-2 border-b";
+            el.textContent = new Date(l.ts).toLocaleString() + " - " + l.msg;
+            secLogs.appendChild(el);
+          });
+        }
+        clearLogs.addEventListener("click", () => {
+          localStorage.removeItem(SEC_LOGS);
+          renderLogs();
+          alert("Security logs cleared (demo).");
+        });
+        renderLogs();
+
+        // Ensure current user is in accounts list
+        (function ensureCurrentInAccounts() {
+          const cur = getCurrentUser();
+          if (!cur) return;
+          const a = loadAccounts();
+          if (!a.find((x) => x.email === cur)) {
+            a.push({ email: cur });
+            saveAccounts(a);
+            renderAccounts();
+          }
+        })();
+      })();
+    </script>
+  </body>
+</html>

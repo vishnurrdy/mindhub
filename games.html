@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Mind Hub - Relaxation Games</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .breath-circle {
+        transition: transform 3s ease-in-out, opacity 0.6s;
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #34d399, #06b6d4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 1.1rem;
+      }
+      .bubble {
+        border-radius: 50%;
+        background: rgba(96, 165, 250, 0.8);
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 min-h-screen font-sans">
+    <div class="max-w-4xl mx-auto p-6">
+      <a href="Dashboard.html" class="text-teal-600 hover:underline"
+        >← Back to Dashboard</a
+      >
+      <h1 class="text-2xl font-bold mt-4">Relaxation Games</h1>
+      <p class="text-gray-600 mt-1">
+        Short calming interactions to help you relax and re-center.
+      </p>
+
+      <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white rounded-lg shadow p-6 text-center">
+          <h2 class="font-semibold text-lg mb-4">Guided Breathing</h2>
+          <div id="breathArea" class="flex flex-col items-center gap-4">
+            <div id="breathCircle" class="breath-circle">Breathe</div>
+            <div class="flex gap-2">
+              <button
+                id="startBreath"
+                class="bg-teal-600 text-white px-3 py-2 rounded"
+              >
+                Start
+              </button>
+              <button id="stopBreath" class="bg-gray-100 px-3 py-2 rounded">
+                Stop
+              </button>
+            </div>
+            <div class="text-sm text-gray-500 mt-2">
+              Follow the circle: inhale as it grows, exhale as it shrinks.
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6 relative overflow-hidden">
+          <h2 class="font-semibold text-lg mb-4">Calm Bubbles</h2>
+          <div
+            id="bubbleField"
+            style="
+              height: 320px;
+              position: relative;
+              background: linear-gradient(180deg, #ecfeff, #f0f9ff);
+              border-radius: 8px;
+              overflow: hidden;
+            "
+          >
+            <!-- bubbles appear here -->
+          </div>
+          <div class="mt-3 flex gap-2">
+            <button
+              id="spawnBubble"
+              class="bg-teal-600 text-white px-3 py-2 rounded"
+            >
+              Spawn Bubble
+            </button>
+            <button id="clearBubbles" class="bg-gray-100 px-3 py-2 rounded">
+              Clear
+            </button>
+          </div>
+          <div class="text-sm text-gray-500 mt-2">
+            Click or tap bubbles to pop them gently.
+          </div>
+        </div>
+      </div>
+      <!-- Fruit Smash Game -->
+      <div class="mt-6 bg-white rounded-lg shadow p-6">
+        <h2 class="font-semibold text-lg mb-4">Fruit Smash</h2>
+        <p class="text-sm text-gray-500 mb-3">
+          Click or tap fruits to smash them and score points before time runs
+          out.
+        </p>
+        <div
+          id="fruitArea"
+          style="
+            position: relative;
+            height: 300px;
+            background: linear-gradient(180deg, #fff7ed, #fff);
+            border-radius: 8px;
+            overflow: hidden;
+          "
+        >
+          <!-- fruits appear here -->
+        </div>
+        <div class="mt-3 flex items-center gap-3">
+          <div class="text-sm">Time: <span id="fruitTimer">30</span>s</div>
+          <div class="text-sm">Score: <span id="fruitScore">0</span></div>
+          <button
+            id="startFruit"
+            class="ml-auto bg-teal-600 text-white px-3 py-2 rounded"
+          >
+            Start
+          </button>
+          <button id="stopFruit" class="bg-gray-100 px-3 py-2 rounded">
+            Stop
+          </button>
+        </div>
+      </div>
+      <!-- New modern relaxation games -->
+      <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white rounded-lg shadow p-6 text-center">
+          <h2 class="font-semibold text-lg mb-4">Zen Garden</h2>
+          <p class="text-sm text-gray-500 mb-3">
+            Click or drag to create ripples and watch them slowly fade.
+          </p>
+          <div class="mx-auto" style="width: 100%; max-width: 520px">
+            <canvas
+              id="zenCanvas"
+              width="520"
+              height="320"
+              style="
+                width: 100%;
+                border-radius: 8px;
+                background: linear-gradient(180deg, #fffaf0, #f0fff4);
+              "
+            ></canvas>
+          </div>
+          <div class="mt-3 flex gap-2 justify-center">
+            <button id="clearZen" class="bg-gray-100 px-3 py-2 rounded">
+              Clear
+            </button>
+            <label class="flex items-center gap-2 text-sm"
+              ><input id="zenSlowMotion" type="checkbox" /> Slow</label
+            >
+          </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6 text-center">
+          <h2 class="font-semibold text-lg mb-4">Soundscape Mixer</h2>
+          <p class="text-sm text-gray-500 mb-3">
+            Layer gentle ambient loops to craft a calming background.
+          </p>
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <div>Rain</div>
+              <div class="flex items-center gap-2">
+                <button
+                  data-track="rain"
+                  class="play-btn bg-teal-600 text-white px-3 py-1 rounded"
+                >
+                  Play
+                </button>
+                <input
+                  data-track="rain"
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value="0.5"
+                />
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>Waves</div>
+              <div class="flex items-center gap-2">
+                <button
+                  data-track="waves"
+                  class="play-btn bg-teal-600 text-white px-3 py-1 rounded"
+                >
+                  Play
+                </button>
+                <input
+                  data-track="waves"
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value="0.4"
+                />
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>Wind Chimes</div>
+              <div class="flex items-center gap-2">
+                <button
+                  data-track="chimes"
+                  class="play-btn bg-teal-600 text-white px-3 py-1 rounded"
+                >
+                  Play
+                </button>
+                <input
+                  data-track="chimes"
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value="0.3"
+                />
+              </div>
+            </div>
+            <div class="text-sm text-gray-500">
+              Note: small demo loops are embedded via data URIs for
+              offline-friendly demo.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Drawing Game -->
+    <div class="mt-6 bg-white rounded-lg shadow p-6">
+      <h2 class="font-semibold text-lg mb-4">Drawing Playground</h2>
+      <p class="text-sm text-gray-500 mb-3">
+        A simple canvas to draw, change brush color/size, clear or save your
+        sketch.
+      </p>
+      <div class="flex flex-col md:flex-row gap-4">
+        <div class="flex-1">
+          <div class="flex items-center gap-2 mb-3">
+            <div class="flex items-center gap-1 bg-gray-50 rounded px-2 py-1">
+              <button
+                id="toolPen"
+                class="tool-btn px-2 py-1 rounded bg-white"
+                title="Pen"
+              >
+                ✏️
+              </button>
+              <button
+                id="toolFill"
+                class="tool-btn px-2 py-1 rounded"
+                title="Fill"
+              >
+                🪣
+              </button>
+              <button
+                id="toolEraser"
+                class="tool-btn px-2 py-1 rounded"
+                title="Eraser"
+              >
+                🧽
+              </button>
+            </div>
+            <div class="flex items-center gap-2 bg-gray-50 rounded px-2 py-1">
+              <input
+                id="colorPicker"
+                type="color"
+                value="#111827"
+                title="Brush color"
+              />
+              <input id="brushSize" type="range" min="1" max="64" value="6" />
+              <div id="brushSizeLabel" class="text-xs text-gray-500">6 px</div>
+            </div>
+            <div class="flex items-center gap-2 ml-auto">
+              <button
+                id="undoBtn"
+                class="bg-white px-2 py-1 rounded"
+                title="Undo"
+              >
+                ↶
+              </button>
+              <button
+                id="redoBtn"
+                class="bg-white px-2 py-1 rounded"
+                title="Redo"
+              >
+                ↷
+              </button>
+              <button id="clearDraw" class="bg-gray-100 px-3 py-2 rounded">
+                Clear
+              </button>
+              <button
+                id="saveDraw"
+                class="bg-teal-600 text-white px-3 py-2 rounded"
+              >
+                Save PNG
+              </button>
+            </div>
+          </div>
+
+          <canvas
+            id="drawCanvas"
+            width="800"
+            height="480"
+            style="
+              width: 100%;
+              height: 320px;
+              border-radius: 8px;
+              background: #fff;
+              box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.03);
+            "
+          ></canvas>
+          <div class="mt-3 flex items-center gap-2">
+            <label class="flex items-center gap-2 text-sm"
+              ><input id="persistDraw" type="checkbox" /> Persist</label
+            >
+          </div>
+        </div>
+        <div style="width: 220px" class="flex-shrink-0">
+          <div class="mb-3">
+            <div class="text-sm font-medium mb-2">Brush Color</div>
+            <div id="colorPalette" class="flex gap-2 flex-wrap">
+              <button
+                class="color-swatch w-8 h-8 rounded"
+                data-color="#111827"
+                style="background: #111827"
+              ></button>
+              <button
+                class="color-swatch w-8 h-8 rounded"
+                data-color="#ef4444"
+                style="background: #ef4444"
+              ></button>
+              <button
+                class="color-swatch w-8 h-8 rounded"
+                data-color="#f97316"
+                style="background: #f97316"
+              ></button>
+              <button
+                class="color-swatch w-8 h-8 rounded"
+                data-color="#f59e0b"
+                style="background: #f59e0b"
+              ></button>
+              <button
+                class="color-swatch w-8 h-8 rounded"
+                data-color="#10b981"
+                style="background: #10b981"
+              ></button>
+              <button
+                class="color-swatch w-8 h-8 rounded"
+                data-color="#06b6d4"
+                style="background: #06b6d4"
+              ></button>
+              <button
+                class="color-swatch w-8 h-8 rounded"
+                data-color="#3b82f6"
+                style="background: #3b82f6"
+              ></button>
+              <button
+                class="color-swatch w-8 h-8 rounded"
+                data-color="#8b5cf6"
+                style="background: #8b5cf6"
+              ></button>
+            </div>
+          </div>
+          <div class="mb-3">
+            <div class="text-sm font-medium mb-2">Brush Size</div>
+            <input id="brushSize" type="range" min="1" max="64" value="6" />
+            <div id="brushSizeLabel" class="text-xs text-gray-500 mt-1">
+              6 px
+            </div>
+          </div>
+          <div class="text-xs text-gray-500">
+            Tip: Use mouse or touch to draw. Toggle Persist to keep the latest
+            sketch in your browser.
+          </div>
+        </div>
+      </div>
+      <div class="mt-4">
+        <div class="text-sm font-medium mb-2">Templates / Coloring Pages</div>
+        <div class="flex gap-3 items-center">
+          <button class="template-btn" data-template="flower" title="Flower">
+            <!-- simple flower outline -->
+            <svg
+              width="120"
+              height="80"
+              viewBox="0 0 120 80"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M60 42 C68 30, 88 28, 92 20 C96 12, 80 6, 68 12 C56 18, 54 6, 44 8 C34 10, 28 24, 36 34 C44 44, 36 60, 50 64 C64 68, 76 58, 80 46 C84 34, 72 34, 60 42 Z"
+                stroke="#222"
+                stroke-width="2"
+                fill="none"
+              />
+              <path
+                d="M60 42 L60 72"
+                stroke="#222"
+                stroke-width="2"
+                fill="none"
+              />
+              <circle
+                cx="60"
+                cy="36"
+                r="6"
+                stroke="#222"
+                stroke-width="2"
+                fill="none"
+              />
+            </svg>
+          </button>
+          <button class="template-btn" data-template="cat" title="Cat">
+            <!-- simple cat outline -->
+            <svg
+              width="120"
+              height="80"
+              viewBox="0 0 120 80"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M20 44 C20 30, 34 20, 50 24 C66 28, 76 18, 100 28 C90 16, 112 8, 108 28 C104 48, 84 54, 82 64 C80 74, 60 78, 50 70 C40 62, 24 60, 20 44 Z"
+                stroke="#222"
+                stroke-width="2"
+                fill="none"
+              />
+              <circle
+                cx="46"
+                cy="42"
+                r="4"
+                stroke="#222"
+                stroke-width="1.5"
+                fill="none"
+              />
+              <circle
+                cx="82"
+                cy="46"
+                r="4"
+                stroke="#222"
+                stroke-width="1.5"
+                fill="none"
+              />
+            </svg>
+          </button>
+          <button
+            class="template-btn"
+            data-template="landscape"
+            title="Landscape"
+          >
+            <!-- simple landscape outline -->
+            <svg
+              width="120"
+              height="80"
+              viewBox="0 0 120 80"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect
+                x="6"
+                y="28"
+                width="108"
+                height="44"
+                rx="6"
+                stroke="#222"
+                stroke-width="2"
+                fill="none"
+              />
+              <path
+                d="M14 60 C30 42, 46 68, 64 50 C80 34, 100 66, 106 54"
+                stroke="#222"
+                stroke-width="2"
+                fill="none"
+              />
+              <circle
+                cx="28"
+                cy="38"
+                r="6"
+                stroke="#222"
+                stroke-width="2"
+                fill="none"
+              />
+            </svg>
+          </button>
+          <button id="clearTemplate" class="text-xs text-gray-500">
+            Clear template
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Guided breathing: simple grow/shrink loop
+      const breathCircle = document.getElementById("breathCircle");
+      let breathTimer = null;
+      let breathPhase = 0; // 0 inhale (grow), 1 hold, 2 exhale (shrink), 3 hold
+      const cycleMs = 4000; // inhale 4s, exhale 4s
+      function startBreathing() {
+        if (breathTimer) return;
+        breathPhase = 0;
+        function step() {
+          if (breathPhase % 2 === 0) {
+            // grow
+            breathCircle.style.transform = "scale(1.45)";
+            breathCircle.textContent = "Inhale";
+          } else {
+            // shrink
+            breathCircle.style.transform = "scale(1)";
+            breathCircle.textContent = "Exhale";
+          }
+          breathPhase++;
+          breathTimer = setTimeout(step, cycleMs);
+        }
+        step();
+      }
+      function stopBreathing() {
+        if (breathTimer) clearTimeout(breathTimer);
+        breathTimer = null;
+        breathCircle.style.transform = "scale(1)";
+        breathCircle.textContent = "Breathe";
+      }
+      document
+        .getElementById("startBreath")
+        .addEventListener("click", startBreathing);
+      document
+        .getElementById("stopBreath")
+        .addEventListener("click", stopBreathing);
+
+      // Calm bubbles
+      const bubbleField = document.getElementById("bubbleField");
+      function spawnBubble() {
+        const b = document.createElement("div");
+        const size = 40 + Math.random() * 60;
+        b.className = "bubble";
+        b.style.width = size + "px";
+        b.style.height = size + "px";
+        b.style.left =
+          10 + Math.random() * (bubbleField.clientWidth - size - 20) + "px";
+        b.style.top =
+          10 + Math.random() * (bubbleField.clientHeight - size - 20) + "px";
+        b.style.opacity = 0.95;
+        b.style.transition = "transform 0.4s ease, opacity 0.3s ease";
+        b.style.display = "flex";
+        b.textContent = "";
+        bubbleField.appendChild(b);
+        b.addEventListener("click", () => {
+          b.style.transform = "scale(0.1)";
+          b.style.opacity = 0;
+          setTimeout(() => b.remove(), 350);
+        });
+      }
+      document
+        .getElementById("spawnBubble")
+        .addEventListener("click", spawnBubble);
+      document.getElementById("clearBubbles").addEventListener("click", () => {
+        bubbleField.innerHTML = "";
+      });
+
+      // spawn a few gentle bubbles periodically
+      setInterval(() => {
+        if (Math.random() < 0.15) spawnBubble();
+      }, 1200);
+
+      // --- Zen Garden (ripples) ---
+      (function () {
+        const canvas = document.getElementById("zenCanvas");
+        if (!canvas) return;
+        const ctx = canvas.getContext("2d");
+        const DPR = window.devicePixelRatio || 1;
+        function resize() {
+          const w = canvas.clientWidth;
+          const h = canvas.clientHeight;
+          canvas.width = Math.round(w * DPR);
+          canvas.height = Math.round(h * DPR);
+          ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+        }
+        resize();
+        window.addEventListener("resize", resize);
+
+        const ripples = [];
+        function addRipple(x, y, strength = 1) {
+          ripples.push({ x, y, r: 0, life: 1, strength });
+        }
+
+        let last = performance.now();
+        function draw(now) {
+          const dt = Math.min(40, now - last) / 1000;
+          last = now;
+          // fade background lightly
+          ctx.fillStyle = "rgba(255,255,250,0.6)";
+          ctx.fillRect(0, 0, canvas.width / DPR, canvas.height / DPR);
+          // draw ripples
+          for (let i = ripples.length - 1; i >= 0; i--) {
+            const r = ripples[i];
+            r.r +=
+              60 *
+              dt *
+              (document.getElementById("zenSlowMotion")?.checked ? 0.35 : 1);
+            r.life -= 0.5 * dt;
+            const alpha = Math.max(0, r.life);
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(56,189,248,${0.35 * alpha * r.strength})`;
+            ctx.lineWidth = 2 + 2 * (1 - alpha);
+            ctx.arc(r.x, r.y, r.r, 0, Math.PI * 2);
+            ctx.stroke();
+            if (r.life <= 0) ripples.splice(i, 1);
+          }
+          requestAnimationFrame(draw);
+        }
+        requestAnimationFrame(draw);
+
+        let dragging = false;
+        function getPos(e) {
+          const rect = canvas.getBoundingClientRect();
+          const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+          const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+          return { x, y };
+        }
+        canvas.addEventListener("pointerdown", (ev) => {
+          dragging = true;
+          const p = getPos(ev);
+          addRipple(p.x, p.y, 1.2);
+        });
+        canvas.addEventListener("pointermove", (ev) => {
+          if (dragging) {
+            const p = getPos(ev);
+            addRipple(p.x, p.y, 0.6);
+          }
+        });
+        window.addEventListener("pointerup", () => {
+          dragging = false;
+        });
+        document.getElementById("clearZen").addEventListener("click", () => {
+          ripples.length = 0;
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        });
+      })();
+
+      // --- Soundscape Mixer ---
+      (function () {
+        if (!window.AudioContext && !window.webkitAudioContext) return;
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        const ctx = new AudioCtx();
+        const tracks = {
+          rain: { node: null, gain: ctx.createGain(), playing: false },
+          waves: { node: null, gain: ctx.createGain(), playing: false },
+          chimes: { node: null, gain: ctx.createGain(), playing: false },
+        };
+        // simple generated loops using noise/oscillators
+        function createRain() {
+          // noise buffer
+          const bufferSize = ctx.sampleRate * 2;
+          const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++)
+            data[i] = (Math.random() * 2 - 1) * 0.4;
+          const src = ctx.createBufferSource();
+          src.buffer = buffer;
+          src.loop = true;
+          const lp = ctx.createBiquadFilter();
+          lp.type = "lowpass";
+          lp.frequency.value = 900;
+          src.connect(lp);
+          lp.connect(tracks.rain.gain);
+          src.start();
+          return src;
+        }
+        function createWaves() {
+          const o = ctx.createOscillator();
+          o.type = "sine";
+          o.frequency.value = 60;
+          const amp = ctx.createGain();
+          amp.gain.value = 0.1;
+          o.connect(amp);
+          amp.connect(tracks.waves.gain);
+          o.start();
+          return o;
+        }
+        function createChimes() {
+          const now = ctx.currentTime;
+          const master = ctx.createGain();
+          master.gain.value = 0.6;
+          // create a simple series of bell-like tones using oscillators
+          const nodes = [];
+          for (let i = 0; i < 4; i++) {
+            const o = ctx.createOscillator();
+            o.type = "sine";
+            o.frequency.value = 800 + Math.random() * 600;
+            const g = ctx.createGain();
+            g.gain.setValueAtTime(0, now + i * 1.2);
+            g.gain.linearRampToValueAtTime(0.25, now + i * 1.2 + 0.02);
+            g.gain.exponentialRampToValueAtTime(0.0001, now + i * 1.2 + 2.5);
+            o.connect(g);
+            g.connect(tracks.chimes.gain);
+            o.start(now + i * 1.2);
+            o.stop(now + i * 1.2 + 3);
+            nodes.push(o);
+          }
+          return { nodes };
+        }
+
+        // wire gains to destination
+        Object.values(tracks).forEach((t) => {
+          t.gain.connect(ctx.destination);
+          t.gain.gain.value = 0.5;
+        });
+
+        function playTrack(name) {
+          if (tracks[name].playing) return; // already
+          if (name === "rain") tracks.rain.node = createRain();
+          if (name === "waves") tracks.waves.node = createWaves();
+          if (name === "chimes") tracks.chimes.node = createChimes();
+          tracks[name].playing = true;
+        }
+        function stopTrack(name) {
+          try {
+            const t = tracks[name];
+            if (!t.playing) return;
+            if (t.node && t.node.stop) {
+              try {
+                t.node.stop();
+              } catch (e) {}
+            }
+            if (t.node && t.node.disconnect) {
+              try {
+                t.node.disconnect();
+              } catch (e) {}
+            }
+          } catch (e) {}
+          tracks[name].node = null;
+          tracks[name].playing = false;
+        }
+
+        // connect UI
+        document.querySelectorAll(".play-btn").forEach((btn) => {
+          btn.addEventListener("click", async (e) => {
+            const name = btn.getAttribute("data-track");
+            // resume context if suspended
+            if (ctx.state === "suspended") await ctx.resume();
+            if (tracks[name].playing) {
+              stopTrack(name);
+              btn.textContent = "Play";
+              btn.classList.add("bg-teal-600");
+              btn.classList.remove("bg-red-500");
+            } else {
+              playTrack(name);
+              btn.textContent = "Stop";
+              btn.classList.remove("bg-teal-600");
+              btn.classList.add("bg-red-500");
+            }
+          });
+        });
+        document.querySelectorAll('input[type="range"]').forEach((r) => {
+          r.addEventListener("input", (e) => {
+            const name = r.getAttribute("data-track");
+            const v = parseFloat(r.value);
+            if (tracks[name]) tracks[name].gain.gain.value = v;
+          });
+        });
+      })();
+    </script>
+    <script src="js/drawing-game.js"></script>
+    <script src="js/fruit-smash.js"></script>
+  </body>
+</html>

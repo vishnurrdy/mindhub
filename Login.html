@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mind Hub - Login</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/site.js"></script>
+    <script src="js/i18n.js"></script>
+    <style>
+      .password-toggle {
+        position: relative;
+      }
+      .toggle-password {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #6b7280;
+        font-size: 1.2rem;
+        line-height: 1;
+      }
+      .toggle-password:hover {
+        color: #4b5563;
+      }
+    </style>
+  </head>
+  <body
+    class="min-h-screen bg-gradient-to-br from-green-50 to-teal-100 flex items-center justify-center p-6"
+  >
+    <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
+      <div class="flex flex-col items-center mb-6">
+        <div
+          class="w-16 h-16 bg-gradient-to-r from-green-600 to-teal-600 rounded-full flex items-center justify-center mb-4"
+        >
+          <!-- Placeholder logo - replace with your own -->
+          <img
+            src="https://placehold.co/48x48?text=MH"
+            alt="Mind Hub Logo"
+            id="siteLogoImg"
+            class="w-10 h-10 rounded-full"
+          />
+        </div>
+        <h1
+          id="loginSiteTitle"
+          class="text-3xl font-extrabold text-gray-800"
+          data-i18n="site_name"
+        ></h1>
+        <p class="text-gray-600 mt-1 text-center">
+          Your gateway to better mental health
+        </p>
+      </div>
+      <h2
+        class="text-2xl font-bold text-center text-gray-800 mb-4"
+        data-i18n="welcome_back"
+      >
+        Welcome Back
+      </h2>
+      <p class="text-center text-gray-600 mb-8">
+        Enter your credentials to access your account
+      </p>
+      <form id="authForm" class="space-y-6" novalidate>
+        <div>
+          <label
+            for="email"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Email Address</label
+          >
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            placeholder="you@example.com"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+          />
+        </div>
+        <div class="password-toggle">
+          <label
+            for="password"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Password</label
+          >
+          <input
+            type="password"
+            id="password"
+            name="password"
+            required
+            placeholder="Enter your password"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 pr-10"
+          />
+          <button
+            type="button"
+            class="toggle-password"
+            aria-label="Toggle password visibility"
+            onclick="togglePassword()"
+          >
+            👁️
+          </button>
+        </div>
+        <div id="confirmRow" style="display: none">
+          <label
+            for="confirm"
+            class="block text-sm font-medium text-gray-700 mb-1"
+            >Confirm Password</label
+          >
+          <input
+            type="password"
+            id="confirm"
+            name="confirm"
+            placeholder="Re-enter your password"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+          />
+        </div>
+        <div class="flex items-center justify-between text-sm">
+          <label class="flex items-center">
+            <input
+              id="remember"
+              type="checkbox"
+              name="remember"
+              class="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded"
+            />
+            <span class="ml-2 text-gray-600">Remember me</span>
+          </label>
+          <a
+            href="#"
+            id="forgotLink"
+            class="text-teal-600 hover:text-teal-800 font-medium"
+            >Forgot password?</a
+          >
+        </div>
+        <button
+          type="submit"
+          id="submitBtn"
+          class="w-full bg-teal-600 text-white py-2 rounded-md font-semibold hover:bg-teal-700 transition-colors"
+          data-i18n="signin"
+        >
+          Sign In
+        </button>
+        <button
+          id="touchIdBtn"
+          type="button"
+          style="display: none"
+          class="w-full mt-2 bg-gray-800 text-white py-2 rounded-md font-semibold hover:bg-gray-900 transition-colors"
+        >
+          Sign in with Touch ID
+        </button>
+      </form>
+      <div class="mt-8 text-center text-gray-600 text-sm">
+        Don't have an account?
+        <a
+          href="#"
+          id="toggleRegister"
+          class="text-teal-600 hover:text-teal-800 font-medium"
+          data-i18n="sign_up"
+          >Sign up</a
+        >
+      </div>
+    </div>
+
+    <script>
+      // Ensure login page site title beside the logo always reflects runtime site name
+      (function () {
+        function updateLoginTitle() {
+          try {
+            const el =
+              document.getElementById("loginSiteTitle") ||
+              document.querySelector('[data-i18n="site_name"]') ||
+              document.querySelector('[data-i18n="settings_title"]');
+            const name =
+              (window.Site && Site.getName && Site.getName()) ||
+              window.SITE_NAME ||
+              "Mind Hub";
+            if (el) el.textContent = name;
+          } catch (e) {
+            console.warn("updateLoginTitle failed", e);
+          }
+        }
+        // initial attempt
+        updateLoginTitle();
+        // after i18n applies, ensure override
+        document.addEventListener("DOMContentLoaded", () =>
+          setTimeout(updateLoginTitle, 0)
+        );
+        // live updates
+        window.addEventListener("site:changed", updateLoginTitle);
+      })();
+      function togglePassword() {
+        const passwordInput = document.getElementById("password");
+        const toggleButton = document.querySelector(".toggle-password");
+        if (passwordInput.type === "password") {
+          passwordInput.type = "text";
+          toggleButton.textContent = "🔒";
+        } else {
+          passwordInput.type = "password";
+          toggleButton.textContent = "👁️";
+        }
+      }
+
+      // Client-side auth helpers (demo only)
+      function saveUser(email, password) {
+        const token = btoa(email + ":" + password.split("").reverse().join(""));
+        localStorage.setItem("wh_user", JSON.stringify({ email, token }));
+      }
+      function getUser() {
+        try {
+          return JSON.parse(localStorage.getItem("wh_user") || "null");
+        } catch (e) {
+          return null;
+        }
+      }
+      function verify(email, password) {
+        const u = getUser();
+        if (!u) return false;
+        const token = btoa(email + ":" + password.split("").reverse().join(""));
+        return token === u.token;
+      }
+
+      // Ensure demo user exists
+      if (!getUser()) {
+        const demoEmail =
+          window.SITE_SLUG && typeof window.SITE_SLUG === "string"
+            ? "hello@" + window.SITE_SLUG + ".example"
+            : "hello@mindhub.example";
+        saveUser(demoEmail, "password123");
+      }
+
+      // Show Touch ID button if credential exists and WebAuthn supported
+      const touchIdBtn = document.getElementById("touchIdBtn");
+      function bufferToBase64(buf) {
+        return btoa(String.fromCharCode(...new Uint8Array(buf)));
+      }
+      function base64ToBuffer(b64) {
+        const s = atob(b64);
+        const arr = new Uint8Array(s.length);
+        for (let i = 0; i < s.length; i++) arr[i] = s.charCodeAt(i);
+        return arr.buffer;
+      }
+      function hasTouchCredential() {
+        return (
+          !!localStorage.getItem("wh_touch_cred") &&
+          !!(navigator.credentials && navigator.credentials.get)
+        );
+      }
+      if (hasTouchCredential()) {
+        touchIdBtn.style.display = "block";
+      }
+
+      touchIdBtn &&
+        touchIdBtn.addEventListener("click", async () => {
+          try {
+            await loginWithTouchId();
+          } catch (e) {
+            console.error("Touch ID login failed", e);
+            alert("Touch ID sign-in failed or not available.");
+          }
+        });
+
+      // Toggle between sign in and register
+      let registerMode = false;
+      const toggleRegister = document.getElementById("toggleRegister");
+      const confirmRow = document.getElementById("confirmRow");
+      const submitBtn = document.getElementById("submitBtn");
+      toggleRegister.addEventListener("click", (e) => {
+        e.preventDefault();
+        registerMode = !registerMode;
+        confirmRow.style.display = registerMode ? "block" : "none";
+        const createTxt =
+          (window.__MH_i18n && __MH_i18n.t("create_account")) ||
+          "Create account";
+        const signInTxt =
+          (window.__MH_i18n && __MH_i18n.t("signin")) || "Sign In";
+        const backTxt =
+          (window.__MH_i18n && __MH_i18n.t("back_to_signin")) ||
+          "Back to sign in";
+        const signupTxt =
+          (window.__MH_i18n && __MH_i18n.t("sign_up")) || "Sign up";
+        submitBtn.textContent = registerMode ? createTxt : signInTxt;
+        toggleRegister.textContent = registerMode ? backTxt : signupTxt;
+      });
+
+      // Handle form submit
+      document
+        .getElementById("authForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const email = (document.getElementById("email").value || "")
+            .trim()
+            .toLowerCase();
+          const password = document.getElementById("password").value || "";
+          const confirm = document.getElementById("confirm").value || "";
+          const remember = document.getElementById("remember").checked;
+
+          if (!email) {
+            alert("Please enter your email.");
+            return;
+          }
+          if (password.length < 6) {
+            alert("Password must be at least 6 characters.");
+            return;
+          }
+
+          if (registerMode) {
+            if (password !== confirm) {
+              alert("Passwords do not match.");
+              return;
+            }
+            // Save user and sign in
+            saveUser(email, password);
+            if (remember) localStorage.setItem("wh_remember", "1");
+            // Redirect to dashboard
+            alert("Account created. Redirecting to Dashboard...");
+            window.location.href = "Dashboard.html";
+            return;
+          }
+
+          // Sign in flow
+          if (verify(email, password)) {
+            if (remember) {
+              localStorage.setItem("wh_remember", "1");
+              // store credentials for demo convenience (insecure) — remove in production
+              localStorage.setItem(
+                "wh_saved_creds",
+                JSON.stringify({ email, password })
+              );
+            } else {
+              localStorage.removeItem("wh_saved_creds");
+            }
+            // Offer to enable Touch ID if available and not already enabled
+            if (
+              navigator.credentials &&
+              navigator.credentials.create &&
+              !localStorage.getItem("wh_touch_cred")
+            ) {
+              try {
+                if (
+                  confirm(
+                    "Sign in successful. Enable Touch ID for faster sign-in on this device?"
+                  )
+                ) {
+                  await registerTouchId(email);
+                  alert("Touch ID enabled (demo). Redirecting...");
+                }
+              } catch (e) {
+                console.warn("Touch ID registration failed", e);
+              }
+            }
+            alert("Sign in successful. Redirecting...");
+            window.location.href = "Dashboard.html";
+          } else {
+            alert("Invalid credentials. Try the demo account or register.");
+          }
+        });
+
+      // Prefill saved credentials if present
+      (function () {
+        try {
+          const saved = JSON.parse(
+            localStorage.getItem("wh_saved_creds") || "null"
+          );
+          if (saved && saved.email) {
+            document.getElementById("email").value = saved.email;
+          }
+          if (saved && saved.password) {
+            document.getElementById("password").value = saved.password;
+            document.getElementById("remember").checked = true;
+          }
+        } catch (e) {}
+      })();
+
+      // --- WebAuthn (Touch ID) demo helpers ---
+      async function registerTouchId(email) {
+        if (!navigator.credentials || !navigator.credentials.create)
+          throw new Error("WebAuthn not supported");
+        // Demo challenge and user id (must be Uint8Array)
+        const challenge = crypto.getRandomValues(new Uint8Array(32));
+        const userId = new TextEncoder().encode(email);
+        const publicKey = {
+          challenge: challenge,
+          rp: { name: window.SITE_NAME || "Mind Hub" },
+          user: { id: userId, name: email, displayName: email },
+          pubKeyCredParams: [{ type: "public-key", alg: -7 }],
+          authenticatorSelection: {
+            authenticatorAttachment: "platform",
+            userVerification: "preferred",
+          },
+          timeout: 60000,
+          attestation: "direct",
+        };
+        const cred = await navigator.credentials.create({ publicKey });
+        if (!cred) throw new Error("No credential created");
+        const rawId = cred.rawId;
+        localStorage.setItem("wh_touch_cred", bufferToBase64(rawId));
+        localStorage.setItem("wh_touch_user", email);
+        // show touch id button
+        touchIdBtn.style.display = "block";
+        return true;
+      }
+
+      async function loginWithTouchId() {
+        if (!navigator.credentials || !navigator.credentials.get)
+          throw new Error("WebAuthn not supported");
+        const idB64 = localStorage.getItem("wh_touch_cred");
+        if (!idB64) throw new Error("No Touch ID credential registered");
+        const allowId = base64ToBuffer(idB64);
+        const challenge = crypto.getRandomValues(new Uint8Array(32));
+        const publicKey = {
+          challenge,
+          allowCredentials: [
+            {
+              id: new Uint8Array(allowId),
+              type: "public-key",
+              transports: ["internal"],
+            },
+          ],
+          timeout: 60000,
+          userVerification: "preferred",
+        };
+        const assertion = await navigator.credentials.get({ publicKey });
+        if (!assertion) throw new Error("No assertion");
+        // On successful assertion, sign the stored user in
+        const email = localStorage.getItem("wh_touch_user");
+        if (email) {
+          const saved = getUser();
+          if (saved && saved.email === email) {
+            // restore local session (demo)
+            localStorage.setItem(
+              "wh_user",
+              JSON.stringify({ email: saved.email, token: saved.token })
+            );
+            window.location.href = "Dashboard.html";
+            return true;
+          }
+        }
+        throw new Error("Stored user not found");
+      }
+
+      // Optional: forgot password flow (demo)
+      document.getElementById("forgotLink").addEventListener("click", (e) => {
+        e.preventDefault();
+        const email = prompt("Enter your email to reset (demo):");
+        if (!email) return;
+        const u = getUser();
+        if (u && u.email === email.toLowerCase().trim()) {
+          const np = prompt("Enter a new password (demo):");
+          if (np && np.length >= 6) {
+            saveUser(u.email, np);
+            alert("Password updated (demo).");
+          } else alert("Password must be at least 6 characters.");
+        } else {
+          alert("No account found with that email (demo).");
+        }
+      });
+    </script>
+  </body>
+</html>

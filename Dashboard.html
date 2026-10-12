@@ -1,0 +1,1735 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mind Hub - Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/site.js"></script>
+  <script src="js/i18n.js"></script>
+    <style>
+      /* Custom scrollbar for chat */
+      .chat-messages {
+        max-height: 400px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #34d399 transparent;
+      }
+      .chat-messages::-webkit-scrollbar {
+        width: 8px;
+      }
+      .chat-messages::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .chat-messages::-webkit-scrollbar-thumb {
+        background-color: #34d399;
+        border-radius: 4px;
+      }
+      /* Scrollbar for sidebar */
+      .sidebar-scroll {
+        max-height: calc(100vh - 4rem);
+        overflow-y: auto;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 flex h-screen font-sans">
+    <!-- Sidebar (collapsible, grouped) -->
+    <aside
+      id="whSidebar"
+      class="hidden md:flex flex-col w-64 bg-gradient-to-b from-teal-700 to-teal-900 text-white shadow-lg transition-width duration-300"
+    >
+      <div
+        class="flex items-center justify-between h-16 border-b border-teal-600 px-4"
+      >
+        <div class="flex items-center gap-3">
+          <img
+            src="https://placehold.co/32x32?text=MH"
+            class="rounded"
+            alt="Mind Hub Logo"
+          />
+          <h1 id="sidebarTitle" class="text-lg font-extrabold tracking-wide" data-i18n="settings_title">Mind Hub</h1>
+        </div>
+        <button
+          id="collapseBtn"
+          class="text-white bg-teal-600/30 px-2 py-1 rounded"
+        >
+      <script src="js/dashboard-upgrades.js"></script>
+        </button>
+      </div>
+
+      <nav id="sidebarNav" class="flex-1 sidebar-scroll px-2 py-4 space-y-2">
+        <div
+          class="px-3 py-2 rounded hover:bg-teal-600/20 flex items-center justify-between"
+        >
+          <a href="Dashboard.html" class="flex items-center gap-3"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M3 3h18v18H3z"
+              /></svg
+            ><span class="ml-1">Dashboard</span></a
+          >
+          <span
+            id="badgeDashboard"
+            class="text-xs bg-red-500/80 px-2 py-0.5 rounded-full hidden"
+            >0</span
+          >
+        </div>
+        <div
+          class="px-3 py-2 rounded hover:bg-teal-600/20 flex items-center justify-between"
+        >
+          <a href="profile.html" class="flex items-center gap-3"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5.121 17.804A7 7 0 0112 15a7 7 0 016.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+              /></svg
+            ><span>Profile</span></a
+          >
+        </div>
+        <div
+          class="px-3 py-2 rounded hover:bg-teal-600/20 flex items-center justify-between"
+        >
+          <a id="mediaSidebarLink" href="#" class="flex items-center gap-3"
+            ><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A2 2 0 0122 9.618v4.764a2 2 0 01-2.447 1.894L15 14v-4zM4 6v12a2 2 0 002 2h7V4H6a2 2 0 00-2 2z"/>
+            </svg>
+            <span>Media</span></a>
+        </div>
+        <div id="mediaSidebarPane" class="hidden p-2 border-t border-teal-600 bg-white text-teal-900 rounded mt-2">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <strong>Media Library</strong>
+              <select id="mediaFilter" class="text-sm text-teal-800 bg-white/80 rounded px-2 py-1">
+                <option value="all">All</option>
+                <option value="audio">Audio</option>
+                <option value="video">Video</option>
+              </select>
+            </div>
+            <button id="mediaClose" class="text-sm text-teal-700">Close</button>
+          </div>
+          <div class="flex gap-2 items-center mb-2">
+            <input id="mediaUploadInput" type="file" accept="audio/*,video/*" multiple />
+            <button id="mediaUploadBtn" class="text-sm px-2 py-1 bg-teal-600 text-white rounded">Upload</button>
+          </div>
+          <div id="mediaList" style="max-height:160px;overflow:auto"></div>
+          <div id="mediaPlayer" class="mt-2 bg-white p-2 rounded hidden">
+            <video id="mediaVideo" controls style="width:100%; display:none; max-height:220px"></video>
+            <audio id="mediaAudio" controls style="width:100%; display:none"></audio>
+          </div>
+        </div>
+        <div
+          class="px-3 py-2 rounded hover:bg-teal-600/20 flex items-center justify-between"
+        >
+          <a href="counselling.html" class="flex items-center gap-3"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2v-7H3v7a2 2 0 002 2z"
+              /></svg
+            ><span>Counselling</span></a
+          >
+          <span
+            id="badgeCounselling"
+            class="text-xs bg-red-500/80 px-2 py-0.5 rounded-full hidden"
+            >0</span
+          >
+        </div>
+        <div
+          id="moodSidebarItem"
+          class="px-3 py-2 rounded hover:bg-teal-600/20 flex items-center justify-between cursor-pointer"
+        >
+          <div class="flex items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87M12 12a4 4 0 100-8 4 4 0 000 8z" />
+            </svg>
+            <span>MoodBot</span>
+          </div>
+          <span id="badgeMood" class="text-xs bg-red-500/80 px-2 py-0.5 rounded-full hidden">0</span>
+        </div>
+        <div
+          class="px-3 py-2 rounded hover:bg-teal-600/20 flex items-center justify-between"
+        >
+          <a href="/media-library/index.html" class="flex items-center gap-3 text-white"
+            ><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v18l15-9L5 3z"/>
+            </svg>
+            <span>Media Library</span></a>
+        </div>
+        <div
+          class="px-3 py-2 rounded hover:bg-teal-600/20 flex items-center justify-between"
+        >
+          <a href="peer-support.html" class="flex items-center gap-3"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87M12 12a4 4 0 100-8 4 4 0 000 8z"
+              /></svg
+            ><span>Peer Support</span></a
+          >
+          <span
+            id="badgePeer"
+            class="text-xs bg-red-500/80 px-2 py-0.5 rounded-full hidden"
+            >0</span
+          >
+        </div>
+        <div class="px-3 py-2 rounded hover:bg-teal-600/20 flex items-center gap-3">
+          <a href="settings.html" class="flex items-center gap-3">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8v4l3 3"
+              /></svg
+            <span data-i18n="settings_title">Settings</span>
+          </a>
+        </div>
+        <div class="px-3 py-2 rounded hover:bg-teal-600/20 flex items-center gap-3">
+          <a href="games.html" class="flex items-center gap-3 text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5v14"/></svg>
+            <span>Games</span>
+          </a>
+        </div>
+        <div class="px-3 py-2 rounded hover:bg-teal-600/20 flex items-center gap-3">
+          <a href="ai-chat.html" class="flex items-center gap-3 text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8-1.59 0-3.088-.28-4.4-.78L3 21l1.78-4.6C3.98 15.59 3 13.87 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+            <span>AI Chat</span>
+          </a>
+        </div>
+        <div class="px-3 py-2 rounded hover:bg-teal-600/20 flex items-center gap-3">
+          <a href="micro-goals.html" class="flex items-center gap-3 text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7 7h10M7 19h10"/></svg>
+            <span>Micro Goal Planner</span>
+          </a>
+        </div>
+        <div
+          class="px-3 py-2 rounded hover:bg-red-600/20 flex items-center gap-3"
+        >
+          <a href="logout.html" class="flex items-center gap-3 text-white"
+            ><svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 16l4-4m0 0l-4-4m4 4H7"
+              /></svg
+            ><span>Logout</span></a
+          >
+        </div>
+      </nav>
+      <div class="p-3 border-t border-teal-600 text-xs text-white/80">
+        <div>Tip: Press <strong>Ctrl+B</strong> to toggle sidebar</div>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <div class="flex flex-col flex-1 overflow-hidden">
+      <!-- Header -->
+      <header
+        class="flex items-center justify-between bg-white shadow px-6 h-16"
+      >
+        <button
+          id="sidebarToggle"
+          class="md:hidden text-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 rounded"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-8 w-8"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          </svg>
+        </button>
+        <!-- Now Playing (small) -->
+        <div id="nowPlayingBar" class="hidden items-center gap-4 ml-4">
+          <div id="nowPlayingTitle" class="text-sm text-teal-700"></div>
+          <button id="nowPlayPrev" class="text-teal-700">⟨</button>
+          <button id="nowPlayToggle" class="text-teal-700">Play</button>
+          <button id="nowPlayNext" class="text-teal-700">⟩</button>
+        </div>
+        <h2 class="text-xl font-semibold text-gray-800">Dashboard</h2>
+        <!-- Quick actions -->
+        <div id="quickActions" class="hidden md:flex items-center gap-3 ml-4">
+          <button id="quickGoalBtn" title="Open Micro Goal Planner" class="text-sm px-3 py-1 rounded bg-emerald-50 text-emerald-700">Goals</button>
+          <button id="quickPeerBtn" title="Open Peer Support" class="text-sm px-3 py-1 rounded bg-indigo-50 text-indigo-700">Peer</button>
+          <button id="quickAI" title="Open AI Chat" class="text-sm px-3 py-1 rounded bg-teal-50 text-teal-700">AI Chat</button>
+          <div id="microGoalProgress" class="ml-4 hidden items-center gap-2">
+            <div class="text-xs text-gray-500">Goals:</div>
+            <div style="width:140px" class="bg-gray-200 rounded overflow-hidden h-2">
+              <div id="microGoalBar" style="width:0%" class="bg-emerald-500 h-2"></div>
+            </div>
+            <div id="microGoalPct" class="text-xs text-gray-600 ml-2">0%</div>
+          </div>
+        </div>
+        <div class="hidden md:flex items-center space-x-4">
+          <span id="welcomeUser" class="text-gray-600 font-medium"
+            >Welcome, User</span
+          >
+          <div class="flex items-center gap-2">
+            <button
+              id="scrollUp"
+              title="Scroll up"
+              class="text-gray-600 hover:bg-gray-100 rounded p-2"
+            >
+              ▲
+            </button>
+            <button id="openMediaBtn" title="Media library" class="text-gray-600 hover:bg-gray-100 rounded p-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A2 2 0 0122 9.618v4.764a2 2 0 01-2.447 1.894L15 14v-4zM4 6v12a2 2 0 002 2h7V4H6a2 2 0 00-2 2z"/></svg>
+            </button>
+            <button
+              id="scrollDown"
+              title="Scroll down"
+              class="text-gray-600 hover:bg-gray-100 rounded p-2"
+            >
+              ▼
+            </button>
+          </div>
+          <img
+            src="https://placehold.co/40x40?text=MH"
+            alt="User avatar"
+            class="rounded-full"
+          />
+        </div>
+      </header>
+
+    <style>
+      /* Hide notification badges across the dashboard */
+      #badgeDashboard, #badgeCounselling, #badgeMood, #badgePeer { display: none !important; }
+    </style>
+
+      <script>
+        // Ensure the sidebar/site label next to the logo always reflects current site name
+        (function () {
+          try {
+            function updateLabel() {
+              const st = document.getElementById('sidebarTitle');
+              const name = (window.Site && Site.getName && Site.getName()) || window.SITE_NAME || 'Mind Hub';
+              if (st) st.textContent = name;
+            }
+            // initial
+            updateLabel();
+            // listen for changes
+            window.addEventListener('site:changed', updateLabel);
+            // also listen for DOMContentLoaded in case site.js loads later
+            document.addEventListener('DOMContentLoaded', updateLabel);
+          } catch (e) {
+            console.warn('site label update failed', e);
+          }
+        })();
+      </script>
+
+      <!-- Content area -->
+      <main
+        class="flex flex-col md:flex-row flex-1 overflow-hidden p-6 space-y-6 md:space-y-0 md:space-x-6 bg-gray-100"
+      >
+        <!-- Left: AI Chat Box -->
+        <section
+          class="flex flex-col flex-1 bg-white rounded-xl shadow-lg p-6 max-h-[calc(100vh-96px)]"
+        >
+          <h3 class="text-2xl font-bold text-teal-700 mb-3">AI Chat Box</h3>
+          <div class="flex items-center gap-3 mb-3">
+            <button id="setGeminiKey" class="text-sm px-3 py-1 rounded bg-gray-100 hover:bg-gray-200">Set Gemini Key</button>
+            <button id="addKnowledge" class="text-sm px-3 py-1 rounded bg-gray-100 hover:bg-gray-200">Add Knowledge</button>
+            <button id="clearChat" class="text-sm px-3 py-1 rounded bg-gray-100 hover:bg-gray-200">Clear</button>
+            <button id="saveConv" class="text-sm px-3 py-1 rounded bg-gray-100 hover:bg-gray-200">Save Conversation</button>
+            <div id="aiIndicator" class="ml-auto text-sm text-gray-500">Mode: <span id="aiMode">Local</span></div>
+          </div>
+          <div
+            id="chatMessages"
+            class="chat-messages flex flex-col space-y-4 overflow-y-auto px-2 pb-4"
+          >
+            <!-- Messages appear here -->
+          </div>
+          <form
+            id="chatForm"
+            class="mt-auto flex space-x-3 pt-4 border-t border-gray-200"
+          >
+            <input
+              type="text"
+              id="chatInput"
+              placeholder="Ask me anything about your wellness..."
+              class="flex-grow border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500"
+              autocomplete="off"
+              required
+            />
+            <button
+              type="submit"
+              class="bg-teal-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-teal-700 transition"
+            >
+              Send
+            </button>
+          </form>
+        </section>
+
+        <!-- Right: Cards -->
+        <section class="flex flex-col space-y-6 w-full max-w-md">
+          <!-- Previous Mentors -->
+          <div
+            class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
+          >
+            <h4
+              class="text-lg font-semibold text-teal-700 mb-4 flex items-center space-x-2"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-6 w-6 text-teal-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+          <div
+            class="px-3 py-2 rounded hover:bg-teal-600/20 flex items-center justify-between gap-2"
+          >
+            <div class="flex items-center gap-3">
+              <a id="offlineMediaLink" href="/offline-media/index.html" target="_blank" class="flex items-center gap-3"
+                ><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A2 2 0 0122 9.618v4.764a2 2 0 01-2.447 1.894L15 14v-4zM4 6v12a2 2 0 002 2h7V4H6a2 2 0 00-2 2z"/>
+                </svg>
+                <span>Offline Media</span></a>
+              <button id="offlineEmbedToggle" title="Open embedded sidebar player" class="text-white/90 bg-teal-600/20 px-2 py-1 rounded hover:bg-teal-600/30">Embed</button>
+            </div>
+          </div>
+          <!-- Sidebar embedded pane (hidden by default) -->
+          <div id="offlineSidebarPane" class="hidden p-2 border-t border-teal-600 bg-white text-teal-900 rounded mt-2">
+            <div class="flex items-center justify-between mb-2">
+              <strong>Offline Media</strong>
+              <button id="offlineSidebarClose" class="text-sm text-teal-700">Close</button>
+            </div>
+            <iframe id="offlineSidebarFrame" src="/offline-media/index.html" style="width:100%;height:260px;border:0;border-radius:6px"></iframe>
+          </div>
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87M12 12a4 4 0 100-8 4 4 0 000 8z"
+                />
+              </svg>
+              <span>Previous Mentors</span>
+            </h4>
+            <ul class="space-y-3 text-gray-700">
+              <li class="border-b border-gray-200 pb-2">
+                <strong>Dr. Sarah Lee</strong><br />
+                Mental Health<br />
+                <small class="text-gray-500">Last session: Mar 15, 2024</small>
+              </li>
+              <li class="border-b border-gray-200 pb-2">
+                <strong>John Smith</strong><br />
+                Nutrition<br />
+                <small class="text-gray-500">Last session: Feb 10, 2024</small>
+              </li>
+              <li>
+                <strong>Emily Johnson</strong><br />
+                Fitness Coach<br />
+                <small class="text-gray-500">Last session: Jan 20, 2024</small>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Counselling Sessions -->
+          <div
+            class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
+          >
+            <h4
+              class="text-lg font-semibold text-teal-700 mb-4 flex items-center space-x-2"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-6 w-6 text-teal-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2v-7H3v7a2 2 0 002 2z"
+                />
+              </svg>
+              <span>Counselling Sessions</span>
+            </h4>
+            <ul class="space-y-3 text-gray-700">
+              <li class="border-b border-gray-200 pb-2">
+                <strong>Upcoming:</strong> Apr 5, 2024 - 3:00 PM with Dr. Sarah
+                Lee
+              </li>
+              <li class="border-b border-gray-200 pb-2">
+                <strong>Completed:</strong> Mar 15, 2024 - 2:00 PM with Dr.
+                Sarah Lee
+              </li>
+              <li>
+                <strong>Completed:</strong> Feb 10, 2024 - 1:00 PM with John
+                Smith
+              </li>
+            </ul>
+          </div>
+
+          <!-- Peer Support -->
+          <div
+            class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow flex flex-col"
+          >
+            <h4
+              class="text-lg font-semibold text-teal-700 mb-4 flex items-center space-x-2"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-6 w-6 text-teal-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87M12 12a4 4 0 100-8 4 4 0 000 8z"
+                />
+              </svg>
+              <span>Peer Support</span>
+            </h4>
+            <p class="text-gray-700 mb-4">
+              Join our community forums and chat groups to connect with peers.
+            </p>
+            <a
+              href="#"
+              class="mt-auto inline-block bg-teal-600 text-white px-5 py-3 rounded-lg font-semibold text-center hover:bg-teal-700 transition"
+              >Go to Peer Support</a
+            >
+          </div>
+
+          <!-- Wellness Progress -->
+          <div
+            class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
+          >
+            <h4
+              class="text-lg font-semibold text-teal-700 mb-4 flex items-center space-x-2"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-6 w-6 text-teal-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 17v-6a2 2 0 012-2h6"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M13 7h7v7"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M3 17h6"
+                />
+              </svg>
+              <span>Your Wellness Progress</span>
+            </h4>
+            <div class="space-y-5 text-gray-700">
+              <div>
+                <div class="flex justify-between mb-1 font-semibold">
+                  Mental Health <span>75%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-4">
+                  <div
+                    class="h-4 rounded-full bg-gradient-to-r from-teal-400 to-teal-600"
+                    style="width: 75%"
+                  ></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-1 font-semibold">
+                  Physical Fitness <span>60%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-4">
+                  <div
+                    class="h-4 rounded-full bg-gradient-to-r from-teal-400 to-teal-600"
+                    style="width: 60%"
+                  ></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-1 font-semibold">
+                  Nutrition <span>80%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-4">
+                  <div
+                    class="h-4 rounded-full bg-gradient-to-r from-teal-400 to-teal-600"
+                    style="width: 80%"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Personalized Mentor & Wellness -->
+          <div
+            id="mentorCard"
+            class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
+          >
+            <div class="flex items-center justify-between">
+              <h4 class="text-lg font-semibold text-teal-700">
+                Hello, <span id="greetName">User</span>
+              </h4>
+              <div class="text-sm text-gray-500" id="greetTime"></div>
+            </div>
+            <p class="text-gray-700 mt-2" id="mentorIntro">
+              Your personal mentor is here to support your journey.
+            </p>
+            <div class="mt-4 grid grid-cols-3 gap-3 text-center">
+              <div>
+                <div class="text-sm text-gray-500">Overall</div>
+                <div class="text-2xl font-bold text-teal-600" id="pctOverall">
+                  --%
+                </div>
+              </div>
+              <div>
+                <div class="text-sm text-gray-500">Stress</div>
+                <div class="text-2xl font-bold text-teal-600" id="pctStress">
+                  --%
+                </div>
+              </div>
+              <div>
+                <div class="text-sm text-gray-500">Sleep</div>
+                <div class="text-2xl font-bold text-teal-600" id="pctSleep">
+                  --%
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 flex gap-3">
+              <button
+                id="moodCheck"
+                class="flex-1 bg-teal-600 text-white px-4 py-2 rounded"
+              >
+                Take Daily Mood Check
+              </button>
+              <button
+                id="connectMentor"
+                class="flex-1 bg-gray-100 px-4 py-2 rounded"
+              >
+                Connect Mentor
+              </button>
+            </div>
+
+            <div class="mt-4">
+              <label class="block text-sm font-medium">Mindful Reminders</label>
+              <div class="flex gap-2 mt-2">
+                <input
+                  id="reminderText"
+                  placeholder="Short reminder (e.g. Breathe)"
+                  class="flex-1 rounded border px-3 py-2"
+                />
+                <input
+                  id="reminderMin"
+                  type="number"
+                  placeholder="mins"
+                  class="w-24 rounded border px-3 py-2"
+                />
+                <button id="setReminder" class="bg-gray-100 px-3 py-2 rounded">
+                  Set
+                </button>
+              </div>
+              <div id="remindersList" class="mt-3 text-sm text-gray-600"></div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Simplified MoodBot Panel (opened from sidebar) -->
+    <div id="moodPanel" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50">
+      <div class="bg-white rounded-lg shadow-xl w-11/12 max-w-2xl p-4">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-lg font-semibold">Mood Check</h3>
+          <div class="flex items-center gap-2">
+            <button id="moodExport" class="px-3 py-1 bg-teal-600 text-white rounded">Export</button>
+            <button id="moodClearAll" class="px-3 py-1 bg-red-500 text-white rounded">Clear</button>
+            <button id="moodClosePanel" class="px-3 py-1 bg-gray-100 rounded">Close</button>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <div class="text-sm text-gray-600 mb-2">How are you feeling right now?</div>
+            <div id="moodEmojis" class="flex gap-3">
+              <button class="mood-emoji px-3 py-2 rounded text-xl" data-value="5">🥳</button>
+              <button class="mood-emoji px-3 py-2 rounded text-xl" data-value="4">🙂</button>
+              <button class="mood-emoji px-3 py-2 rounded text-xl" data-value="3">😐</button>
+              <button class="mood-emoji px-3 py-2 rounded text-xl" data-value="2">😟</button>
+              <button class="mood-emoji px-3 py-2 rounded text-xl" data-value="1">😢</button>
+            </div>
+          </div>
+
+          <div class="flex gap-2">
+            <input id="moodNote" placeholder="Short note (optional)" class="flex-1 rounded border px-3 py-2" />
+            <button id="moodAdd" class="px-4 py-2 bg-teal-600 text-white rounded">Add</button>
+          </div>
+
+          <div>
+            <h4 class="font-semibold mb-2">Recent entries</h4>
+            <div id="moodHistory" class="max-h-48 overflow-auto text-sm text-gray-800 border rounded p-2"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Sidebar toggle for mobile
+      const sidebar = document.querySelector("aside");
+      const toggleBtn = document.getElementById("sidebarToggle");
+      toggleBtn.addEventListener("click", () => {
+        sidebar.classList.toggle("hidden");
+      });
+
+      // Scrolling controls: Smooth scroll up/down for main content area
+      const scrollUpBtn = document.getElementById("scrollUp");
+      const scrollDownBtn = document.getElementById("scrollDown");
+      const mainArea = document.querySelector("main");
+      function smoothScroll(delta) {
+        // delta positive = down, negative = up
+        const distance =
+          Math.max(200, window.innerHeight * 0.6) * (delta > 0 ? 1 : -1);
+        window.scrollBy({ top: distance, left: 0, behavior: "smooth" });
+      }
+      if (scrollUpBtn)
+        scrollUpBtn.addEventListener("click", () => smoothScroll(-1));
+      if (scrollDownBtn)
+        scrollDownBtn.addEventListener("click", () => smoothScroll(1));
+
+      // Keyboard shortcuts: PageUp/PageDown for convenience
+      window.addEventListener("keydown", (e) => {
+        if (
+          e.code === "PageDown" ||
+          (e.key === " " &&
+            !e.shiftKey &&
+            e.target.tagName !== "INPUT" &&
+            e.target.tagName !== "TEXTAREA")
+        ) {
+          e.preventDefault();
+          smoothScroll(1);
+        } else if (
+          e.code === "PageUp" ||
+          (e.key === " " &&
+            e.shiftKey &&
+            e.target.tagName !== "INPUT" &&
+            e.target.tagName !== "TEXTAREA")
+        ) {
+          e.preventDefault();
+          smoothScroll(-1);
+        }
+      });
+
+      // Sidebar collapse behavior and unread badge updates
+      (function () {
+        const sidebarEl = document.getElementById("whSidebar");
+        const collapseBtn = document.getElementById("collapseBtn");
+        const badgeDashboard = document.getElementById("badgeDashboard");
+        const badgeCounselling = document.getElementById("badgeCounselling");
+        const badgePeer = document.getElementById("badgePeer");
+        const SIDEBAR_KEY = "wh_sidebar_collapsed";
+
+        function setCollapsed(collapsed) {
+          if (collapsed) {
+            sidebarEl.classList.add("w-20");
+            sidebarEl.classList.remove("w-64");
+            document.getElementById("sidebarTitle").classList.add("hidden");
+            collapseBtn.textContent = "⟩";
+          } else {
+            sidebarEl.classList.remove("w-20");
+            sidebarEl.classList.add("w-64");
+            document.getElementById("sidebarTitle").classList.remove("hidden");
+            collapseBtn.textContent = "⟨";
+          }
+          localStorage.setItem(SIDEBAR_KEY, collapsed ? "1" : "0");
+        }
+
+        collapseBtn.addEventListener("click", () => {
+          const cur = localStorage.getItem(SIDEBAR_KEY) === "1";
+          setCollapsed(!cur);
+        });
+        // keyboard Ctrl+B to toggle
+        window.addEventListener("keydown", (e) => {
+          if (e.ctrlKey && e.key.toLowerCase() === "b") {
+            e.preventDefault();
+            const cur = localStorage.getItem(SIDEBAR_KEY) === "1";
+            setCollapsed(!cur);
+          }
+        });
+
+        // compute unread counts from localStorage wh_notifs_<email>
+        function unreadCountFor(key) {
+          try {
+            const a = JSON.parse(localStorage.getItem(key) || "[]");
+            return a.length;
+          } catch (e) {
+            return 0;
+          }
+        }
+        function updateBadges() {
+          try {
+            const email =
+              (JSON.parse(localStorage.getItem("wh_user") || "null") || {})
+                .email || "guest";
+            const base = "wh_notifs_" + email;
+            const total = unreadCountFor(base);
+            if (total > 0) {
+              badgeDashboard.textContent = total;
+              badgeDashboard.classList.remove("hidden");
+            } else {
+              badgeDashboard.classList.add("hidden");
+            }
+            const c = unreadCountFor("wh_notifs_counselling_" + email);
+            if (c > 0) {
+              badgeCounselling.textContent = c;
+              badgeCounselling.classList.remove("hidden");
+            } else {
+              badgeCounselling.classList.add("hidden");
+            }
+            const p = unreadCountFor("wh_notifs_peer_" + email);
+            if (p > 0) {
+              badgePeer.textContent = p;
+              badgePeer.classList.remove("hidden");
+            } else {
+              badgePeer.classList.add("hidden");
+            }
+          } catch (e) {
+            console.warn("updateBadges failed", e);
+          }
+        }
+
+        // init
+        const startCollapsed = localStorage.getItem(SIDEBAR_KEY) === "1";
+        setCollapsed(startCollapsed);
+        updateBadges();
+        // update badges periodically (could be optimized with events)
+        setInterval(updateBadges, 5000);
+      })();
+
+      // AI Chat Box logic
+  const chatForm = document.getElementById("chatForm");
+  const chatInput = document.getElementById("chatInput");
+  const chatMessages = document.getElementById("chatMessages");
+  const clearChatBtn = document.getElementById("clearChat");
+  const saveConvBtn = document.getElementById("saveConv");
+  const aiModeLabel = document.getElementById("aiMode");
+  // optional API key buttons (may not exist in UI)
+  const setApiKeyBtn = document.getElementById("setApiKey");
+  const setGeminiKeyBtn = document.getElementById("setGeminiKey");
+
+      // Simple conversation memory (keeps last N messages)
+      const MAX_CONTEXT = 12;
+      let convo = JSON.parse(sessionStorage.getItem("wh_convo") || "[]");
+
+      function persistConvo() {
+        sessionStorage.setItem(
+          "wh_convo",
+          JSON.stringify(convo.slice(-MAX_CONTEXT))
+        );
+      }
+
+      function createMessage(text, sender) {
+        const wrapper = document.createElement("div");
+        wrapper.classList.add("flex");
+        const msg = document.createElement("div");
+        msg.classList.add(
+          "max-w-xs",
+          "px-4",
+          "py-2",
+          "rounded-lg",
+          "break-words",
+          "whitespace-pre-wrap"
+        );
+        if (sender === "user") {
+          wrapper.classList.add("justify-end");
+          msg.classList.add("bg-teal-600", "text-white", "rounded-br-none");
+        } else {
+          wrapper.classList.add("justify-start");
+          msg.classList.add("bg-gray-200", "text-gray-800", "rounded-bl-none");
+        }
+        msg.textContent = text;
+        wrapper.appendChild(msg);
+        return wrapper;
+      }
+
+      function showTyping(show = true) {
+        let el = document.getElementById("typingIndicator");
+        if (show) {
+          if (!el) {
+            el = document.createElement("div");
+            el.id = "typingIndicator";
+            el.className = "text-gray-500 text-sm italic";
+            el.textContent = "Assistant is typing...";
+            chatMessages.appendChild(el);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+          }
+        } else {
+          if (el) el.remove();
+        }
+      }
+
+      // Local fallback responses (improved rule-based + template) with retrieval augmentation
+      // Small client-side knowledge base (stored in localStorage under 'wh_kb')
+      function loadKB() {
+        try {
+          return JSON.parse(localStorage.getItem("wh_kb") || "[]");
+        } catch (e) {
+          return [];
+        }
+      }
+      function saveKB(kb) {
+        localStorage.setItem("wh_kb", JSON.stringify(kb));
+      }
+
+      // Simple tokenizer
+      function tokens(text) {
+        return text
+          .toLowerCase()
+          .split(/[^a-z0-9]+/)
+          .filter(Boolean);
+      }
+
+      // Build simple TF map for a doc
+      function tfMap(text) {
+        const t = tokens(text);
+        const m = {};
+        t.forEach((w) => (m[w] = (m[w] || 0) + 1));
+        return m;
+      }
+
+      // Cosine-like similarity using token overlap and TF
+      function scoreDoc(query, doc) {
+        const qmap = tfMap(query);
+        const dmap = tfMap(doc);
+        let num = 0,
+          dq = 0,
+          dd = 0;
+        for (const k in qmap) {
+          num += (qmap[k] || 0) * (dmap[k] || 0);
+          dq += (qmap[k] || 0) ** 2;
+        }
+        for (const k in dmap) {
+          dd += (dmap[k] || 0) ** 2;
+        }
+        if (dq === 0 || dd === 0) return 0;
+        return num / (Math.sqrt(dq) * Math.sqrt(dd));
+      }
+
+      function topKDocs(query, k = 3) {
+        const kb = loadKB();
+        const scored = kb.map((d) => ({
+          d,
+          s: scoreDoc(query, (d.title || "") + " " + (d.content || "")),
+        }));
+        scored.sort((a, b) => b.s - a.s);
+        return scored
+          .slice(0, k)
+          .filter((x) => x.s > 0.0)
+          .map((x) => x.d);
+      }
+
+      function localFallback(userText) {
+        const lower = userText.toLowerCase();
+        // retrieval
+        const docs = topKDocs(userText, 4);
+        let kbContext = "";
+        if (docs && docs.length) {
+          kbContext =
+            "\n\nRelevant knowledge:\n" +
+            docs
+              .map(
+                (d) =>
+                  `- ${d.title}: ${d.content.slice(0, 240)}${
+                    d.content.length > 240 ? "..." : ""
+                  }`
+              )
+              .join("\n");
+        }
+
+        // rule-based quick answers
+        if (/hello|hi|hey/.test(lower))
+  return `Hello! I'm your ${window.SITE_NAME || 'Mind Hub'} assistant. How can I help you today?`;
+        if (lower.includes("stress"))
+          return (
+            "For stress: try deep breathing (4-4-8), short walks, and consistent sleep. Would you like a guided breathing exercise?" +
+            kbContext
+          );
+        if (lower.includes("sleep"))
+          return (
+            "Good sleep hygiene helps: set a schedule, avoid screens before bed, and keep your bedroom cool and dark." +
+            kbContext
+          );
+        if (lower.includes("nutrition"))
+          return (
+            "Focus on whole foods: vegetables, lean proteins, whole grains, and limit processed sugars." +
+            kbContext
+          );
+        if (lower.includes("exercise") || lower.includes("workout"))
+          return (
+            "Aim for 150 minutes of moderate activity weekly and include strength training twice a week." +
+            kbContext
+          );
+        if (lower.includes("counsel") || lower.includes("therap"))
+          return (
+            "If you're seeking counselling, consider booking a session with our in-platform counsellors. Would you like available slots?" +
+            kbContext
+          );
+        // fallback: include KB context in reply
+        return `I can help with wellness advice. ${
+          kbContext || "Tell me a bit more so I can assist."
+        }`;
+      }
+
+      // Add knowledge UI handler
+      document.getElementById("addKnowledge").addEventListener("click", () => {
+        const title = prompt("Knowledge title (short):");
+        if (!title) return;
+        const content = prompt(
+          "Paste the content/text for this knowledge item (a few sentences):"
+        );
+        if (!content) return;
+        const kb = loadKB();
+        kb.unshift({ title, content, created: Date.now() });
+        saveKB(kb);
+        alert(
+          "Knowledge added to local KB. It will be used to improve answers."
+        );
+      });
+
+      async function callOpenAI(messages) {
+        const key = localStorage.getItem("wh_openai_key");
+        if (!key) throw new Error("No API key");
+        const url = "https://api.openai.com/v1/chat/completions";
+        const body = { model: "gpt-3.5-turbo", messages: messages };
+        const resp = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + key,
+          },
+          body: JSON.stringify(body),
+        });
+        if (!resp.ok) {
+          const t = await resp.text();
+          throw new Error("OpenAI error: " + t);
+        }
+        const data = await resp.json();
+        const reply =
+          data.choices &&
+          data.choices[0] &&
+          data.choices[0].message &&
+          data.choices[0].message.content;
+        return reply || "Sorry, I could not generate an answer.";
+      }
+
+      async function callGemini(messages) {
+        const key = localStorage.getItem("wh_gemini_key");
+        if (!key) throw new Error("No Gemini API key");
+        const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" + key;
+        // Gemini expects [{role: 'user', parts: [{text: '...'}]}]
+        const userMsg = messages[messages.length - 1].content;
+        const body = {
+          contents: [
+            {
+              role: "user",
+              parts: [{ text: userMsg }],
+            },
+          ],
+        };
+        const resp = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        if (!resp.ok) {
+          const t = await resp.text();
+          throw new Error("Gemini error: " + t);
+        }
+        const data = await resp.json();
+        const reply =
+          data.candidates &&
+          data.candidates[0] &&
+          data.candidates[0].content &&
+          data.candidates[0].content.parts &&
+          data.candidates[0].content.parts[0] &&
+          data.candidates[0].content.parts[0].text;
+        return reply || "Sorry, Gemini could not generate an answer.";
+      }
+
+      async function getAIResponse(userText) {
+        convo.push({ role: "user", content: userText });
+        persistConvo();
+        const system = {
+          role: "system",
+      content:
+        `You are a helpful, concise wellness assistant for the ${window.SITE_NAME || 'Mind Hub'} platform. Be empathetic and provide actionable wellness advice.`,
+        };
+        const messages = [system].concat(convo.slice(-MAX_CONTEXT));
+        // Try Gemini if key present
+        const hasGemini = !!localStorage.getItem("wh_gemini_key");
+        if (hasGemini) {
+          aiModeLabel.textContent = "Gemini";
+          showTyping(true);
+          try {
+            const reply = await callGemini(messages);
+            convo.push({ role: "assistant", content: reply });
+            persistConvo();
+            showTyping(false);
+            return reply;
+          } catch (err) {
+            showTyping(false);
+            console.error(err);
+            return (
+              "Error contacting Gemini API: " +
+              err.message +
+              ". Falling back to local responses."
+            );
+          }
+        }
+        // Try OpenAI if key present
+        const hasOpenAI = !!localStorage.getItem("wh_openai_key");
+        if (hasOpenAI) {
+          aiModeLabel.textContent = "OpenAI";
+          showTyping(true);
+          try {
+            const reply = await callOpenAI(messages);
+            convo.push({ role: "assistant", content: reply });
+            persistConvo();
+            showTyping(false);
+            return reply;
+          } catch (err) {
+            showTyping(false);
+            console.error(err);
+            return (
+              "Error contacting OpenAI API: " +
+              err.message +
+              ". Falling back to local responses."
+            );
+          }
+        }
+        aiModeLabel.textContent = "Local";
+        // fallback
+        const reply = localFallback(userText);
+        convo.push({ role: "assistant", content: reply });
+        persistConvo();
+        return reply;
+      }
+
+      // UI buttons: set API key, clear, save
+      if (setApiKeyBtn) {
+        setApiKeyBtn.addEventListener("click", () => {
+        const existing = localStorage.getItem("wh_openai_key") || "";
+        const k = prompt(
+          "Paste your OpenAI API key (it will be stored locally in your browser only):",
+          existing
+        );
+        if (k === null) return;
+        if (k.trim() === "") {
+          localStorage.removeItem("wh_openai_key");
+          alert("OpenAI key removed.");
+          aiModeLabel.textContent = "Local";
+          return;
+        }
+        localStorage.setItem("wh_openai_key", k.trim());
+        aiModeLabel.textContent = "OpenAI";
+        alert("API key saved locally.");
+        });
+      }
+
+      // Gemini key button
+      if (setGeminiKeyBtn) {
+        setGeminiKeyBtn.addEventListener("click", () => {
+        const existing = localStorage.getItem("wh_gemini_key") || "";
+        const k = prompt(
+          "Paste your Gemini API key (it will be stored locally in your browser only):",
+          existing
+        );
+        if (k === null) return;
+        if (k.trim() === "") {
+          localStorage.removeItem("wh_gemini_key");
+          alert("Gemini key removed.");
+          aiModeLabel.textContent = "Local";
+          return;
+        }
+        localStorage.setItem("wh_gemini_key", k.trim());
+        aiModeLabel.textContent = "Gemini";
+        alert("Gemini API key saved locally.");
+        });
+      }
+
+      clearChatBtn.addEventListener("click", () => {
+        convo = [];
+        persistConvo();
+        chatMessages.innerHTML = "";
+      });
+      saveConvBtn.addEventListener("click", () => {
+        const data = JSON.stringify(convo, null, 2);
+        const blob = new Blob([data], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+  a.download = (window.SITE_SLUG || 'mindhub') + "_conversation.json";
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+
+      chatForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const userText = chatInput.value.trim();
+        if (!userText) return;
+
+        chatMessages.appendChild(createMessage(userText, "user"));
+        chatInput.value = "";
+        chatInput.disabled = true;
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // show typing
+        showTyping(true);
+        const aiReply = await getAIResponse(userText);
+        showTyping(false);
+
+        chatMessages.appendChild(createMessage(aiReply, "assistant"));
+        chatInput.disabled = false;
+        chatInput.focus();
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      });
+
+      // Populate welcome user and protect the dashboard: redirect to login if no signed-in user
+      (function () {
+        try {
+          const user = JSON.parse(localStorage.getItem("wh_user") || "null");
+          if (!user) {
+            window.location.href = "Login/index.html";
+            return;
+          }
+          const welcome = document.getElementById("welcomeUser");
+          if (welcome) welcome.textContent = `Welcome, ${user.email}`;
+        } catch (err) {
+          window.location.href = "Login/index.html";
+        }
+      })();
+
+      // --- Wellness & Mentor JS (new) ---
+      (function () {
+        const greetName = document.getElementById("greetName");
+        const greetTime = document.getElementById("greetTime");
+        const mentorIntro = document.getElementById("mentorIntro");
+        const pctOverall = document.getElementById("pctOverall");
+        const pctStress = document.getElementById("pctStress");
+        const pctSleep = document.getElementById("pctSleep");
+        const moodCheckBtn = document.getElementById("moodCheck");
+        const connectMentorBtn = document.getElementById("connectMentor");
+        const reminderText = document.getElementById("reminderText");
+        const reminderMin = document.getElementById("reminderMin");
+        const setReminder = document.getElementById("setReminder");
+        const remindersList = document.getElementById("remindersList");
+
+        const REM_KEY = "wh_reminders";
+        const WELL_KEY = "wh_wellness";
+
+        function nowStr() {
+          return new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+        }
+
+        // Greet the user
+        try {
+          const user = JSON.parse(localStorage.getItem("wh_user") || "null");
+          const name =
+            (user && (user.name || user.email.split("@")[0])) || "Friend";
+          greetName.textContent = name;
+          greetTime.textContent = nowStr();
+        } catch (e) {
+          greetName.textContent = "Friend";
+        }
+
+        // Load or seed wellness metrics
+        function loadWellness() {
+          try {
+            return JSON.parse(localStorage.getItem(WELL_KEY) || "{}");
+          } catch (e) {
+            return {};
+          }
+        }
+        function saveWellness(w) {
+          localStorage.setItem(WELL_KEY, JSON.stringify(w));
+        }
+        function renderWellness() {
+          const w = loadWellness();
+          pctOverall.textContent = (w.overall || 0) + "%";
+          pctStress.textContent = (w.stress || 0) + "%";
+          pctSleep.textContent = (w.sleep || 0) + "%";
+        }
+        // seed if empty
+        if (!localStorage.getItem(WELL_KEY)) {
+          saveWellness({ overall: 72, stress: 38, sleep: 68 });
+        }
+        renderWellness();
+
+        // Mood check: simple quick survey stored under wh_mood_log
+        moodCheckBtn.addEventListener("click", () => {
+          const mood = prompt(
+            "How are you feeling right now? (1-5 where 5 is great)"
+          );
+          if (!mood) return;
+          const v = parseInt(mood);
+          if (isNaN(v) || v < 1 || v > 5) {
+            alert("Enter a number between 1 and 5");
+            return;
+          }
+          const entry = { ts: Date.now(), mood: v };
+          const logs = JSON.parse(localStorage.getItem("wh_mood_log") || "[]");
+          logs.unshift(entry);
+          localStorage.setItem("wh_mood_log", JSON.stringify(logs));
+          // update wellness metrics simply: mood influences overall
+          const w = loadWellness();
+          w.overall = Math.min(
+            100,
+            Math.max(0, Math.round(((w.overall || 70) + v * 4) / 2))
+          );
+          saveWellness(w);
+          renderWellness();
+          alert("Mood recorded. Thank you!");
+        });
+
+        // Connect to personal mentor (demo): store a pending connection and notify
+        connectMentorBtn.addEventListener("click", () => {
+          const mentor = {
+            name: "Dr. Aisha Khan",
+            specialty: "Mental Health",
+            contact:
+              (window.SITE_SLUG ? "aisha.k@" + window.SITE_SLUG + ".example" : "aisha.k@mindhub.example"),
+          };
+          localStorage.setItem("wh_my_mentor", JSON.stringify(mentor));
+          mentorIntro.textContent = `Connected to ${mentor.name} — ${mentor.specialty}. You can message them via Peer Support or PM.`;
+          addNotification("mentor_connect", `Connected to ${mentor.name}`);
+          alert(`Connected with ${mentor.name} (demo).`);
+        });
+
+        // Reminders: schedule simple timeouts in this page session (demo only)
+        function loadReminders() {
+          try {
+            return JSON.parse(localStorage.getItem(REM_KEY) || "[]");
+          } catch (e) {
+            return [];
+          }
+        }
+        function saveReminders(r) {
+          localStorage.setItem(REM_KEY, JSON.stringify(r));
+        }
+        function renderReminders() {
+          remindersList.innerHTML = "";
+          const r = loadReminders();
+          r.forEach((item, idx) => {
+            const el = document.createElement("div");
+            el.className =
+              "p-2 border rounded mb-2 flex justify-between items-center";
+            el.innerHTML = `<div><strong>${escapeHtml(
+              item.text
+            )}</strong><div class="text-xs text-gray-500">Every ${
+              item.min
+            } min — next at ${new Date(
+              item.next
+            ).toLocaleTimeString()}</div></div><div><button class=\"rmNow bg-gray-100 px-2 py-1 rounded text-sm\">Remove</button></div>`;
+            el.querySelector(".rmNow").addEventListener("click", () => {
+              const arr = loadReminders();
+              arr.splice(idx, 1);
+              saveReminders(arr);
+              renderReminders();
+            });
+            remindersList.appendChild(el);
+          });
+        }
+
+        function scheduleReminder(item) {
+          const delay = Math.max(1000, item.min * 60 * 1000);
+          item.timeoutId = setTimeout(() => {
+            // show notification and reschedule
+            try {
+              if (Notification.permission === "granted")
+                new Notification("Mindful reminder", { body: item.text });
+            } catch (e) {}
+            item.next = Date.now() + delay;
+            saveReminders(loadReminders());
+            scheduleReminder(item);
+          }, delay);
+        }
+
+        setReminder.addEventListener("click", () => {
+          const text = reminderText.value.trim();
+          const min = parseInt(reminderMin.value || "0");
+          if (!text || !min || min <= 0) {
+            alert("Enter reminder text and minutes");
+            return;
+          }
+          const arr = loadReminders();
+          const item = {
+            text,
+            min,
+            created: Date.now(),
+            next: Date.now() + min * 60 * 1000,
+          };
+          arr.push(item);
+          saveReminders(arr);
+          renderReminders(); // schedule immediately for this session
+          try {
+            if (Notification.permission !== "granted")
+              Notification.requestPermission();
+          } catch (e) {}
+          scheduleReminder(item);
+          reminderText.value = "";
+          reminderMin.value = "";
+          alert("Reminder set (demo).");
+        });
+
+        // Render any existing reminders and schedule them for this session
+        loadReminders().forEach((item) => {
+          // reset next if missing
+          if (!item.next) item.next = Date.now() + item.min * 60 * 1000;
+          scheduleReminder(item);
+        });
+        renderReminders();
+
+        // Helper: notifications stored in wh_notifs_<email>
+        function addNotification(type, text) {
+          try {
+            const email =
+              (JSON.parse(localStorage.getItem("wh_user") || "null") || {})
+                .email || "guest";
+            const key = `wh_notifs_${email}`;
+            const arr = JSON.parse(localStorage.getItem(key) || "[]");
+            arr.unshift({ ts: Date.now(), type, text });
+            localStorage.setItem(key, JSON.stringify(arr));
+          } catch (e) {}
+        }
+
+        // Escape helper
+        function escapeHtml(s) {
+          return String(s).replace(/[&<>\"']/g, function (c) {
+            return {
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            }[c];
+          });
+        }
+      })();
+    </script>
+
+    <!-- MoodBot is accessible from the Sidebar now; floating widget removed -->
+
+    <script>
+    // Simplified MoodPanel logic
+    (function(){
+      const PANEL = document.getElementById('moodPanel');
+      const panelClose = document.getElementById('moodClosePanel');
+      const moodSidebar = document.getElementById('moodSidebarItem');
+      const badgeMood = document.getElementById('badgeMood');
+      const KEY = 'wh_mood_log';
+      const historyEl = document.getElementById('moodHistory');
+      const exportBtn = document.getElementById('moodExport');
+      const addBtn = document.getElementById('moodAdd');
+      const noteInput = document.getElementById('moodNote');
+
+      function load(){ try{ return JSON.parse(localStorage.getItem(KEY)||'[]'); }catch(e){ return []; } }
+      function save(v){ localStorage.setItem(KEY, JSON.stringify(v)); }
+
+      function updateBadge(){ const a = load(); badgeMood.textContent = a.length; if(a.length) badgeMood.classList.remove('hidden'); else badgeMood.classList.add('hidden'); }
+
+      function renderHistory(){ const a = load().slice(0,20); historyEl.innerHTML=''; if(!a.length) return historyEl.innerHTML='<div class="text-sm text-gray-500">No entries yet</div>';
+        a.forEach(it=>{ const d=new Date(it.ts); const row=document.createElement('div'); row.className='p-2 border-b flex items-center justify-between'; row.innerHTML = `<div><div class="text-sm">${it.emoji} • <strong>${it.note || ''}</strong></div><div class="text-xs text-gray-500">${d.toLocaleString()}</div></div><div><button class="mood-delete px-2 py-1 text-sm text-red-600">Delete</button></div>`; historyEl.appendChild(row);
+          row.querySelector('.mood-delete').addEventListener('click', ()=>{ const all=load(); const idx = all.findIndex(x=> x.ts===it.ts); if(idx>-1){ all.splice(idx,1); save(all); renderHistory(); updateBadge(); } });
+        }); }
+
+      function addEntry(emoji, value, note){ const arr=load(); arr.unshift({ ts: Date.now(), emoji, value, note: note||'' }); save(arr); updateBadge(); renderHistory(); }
+
+      // emoji buttons
+      document.querySelectorAll('.mood-emoji').forEach(b=> b.addEventListener('click', ()=>{ const v = parseInt(b.dataset.value||3); addEntry(b.textContent, v, noteInput.value.trim()); noteInput.value=''; }));
+      addBtn && addBtn.addEventListener('click', ()=>{ const note = noteInput.value.trim(); addEntry('🤝',3,note); noteInput.value=''; });
+
+      exportBtn && exportBtn.addEventListener('click', ()=>{
+        const a = load(); if(!a.length) return alert('No entries'); const csv = ['ts,date,value,note,emoji'].concat(a.map(it=>`${it.ts},"${new Date(it.ts).toISOString()}",${it.value},"${String(it.note||'').replace(/"/g,'""')}","${it.emoji}"`)).join('\n'); const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob); const aEl=document.createElement('a'); aEl.href=url; aEl.download='mood_log.csv'; aEl.click(); URL.revokeObjectURL(url);
+      });
+
+      document.getElementById('moodClearAll').addEventListener('click', ()=>{ if(!confirm('Clear all mood entries?')) return; save([]); renderHistory(); updateBadge(); });
+
+      // open/close wiring
+      moodSidebar && moodSidebar.addEventListener('click', ()=>{ PANEL.classList.remove('hidden'); PANEL.classList.add('flex'); renderHistory(); updateBadge(); });
+      panelClose && panelClose.addEventListener('click', ()=>{ PANEL.classList.add('hidden'); PANEL.classList.remove('flex'); });
+
+      // init
+      updateBadge(); renderHistory();
+    })();
+    </script>
+  </body>
+  <!-- Media Library modal (iframe) -->
+  <div id="mediaModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50">
+    <div class="bg-white w-[92%] h-[88%] rounded-lg shadow-lg overflow-hidden border">
+      <div class="flex items-center justify-between bg-teal-700 text-white px-4 py-2">
+        <div class="flex items-center gap-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A2 2 0 0122 9.618v4.764a2 2 0 01-2.447 1.894L15 14v-4zM4 6v12a2 2 0 002 2h7V4H6a2 2 0 00-2 2z"/></svg>
+          <strong>Media Library</strong>
+        </div>
+        <div>
+          <button id="mediaModalClose" class="bg-white/20 hover:bg-white/30 px-3 py-1 rounded text-white">Close</button>
+        </div>
+      </div>
+      <iframe id="mediaModalFrame" src="/media-library/index.html" style="width:100%;height:calc(100% - 44px);border:0;background:white"></iframe>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const openBtn = document.getElementById('openMediaBtn');
+      const modal = document.getElementById('mediaModal');
+      const closeBtn = document.getElementById('mediaModalClose');
+      const frame = document.getElementById('mediaModalFrame');
+      if(!openBtn || !modal) return;
+      openBtn.addEventListener('click', function(e){
+        if(e.metaKey || e.ctrlKey || e.shiftKey) return; e.preventDefault();
+        modal.classList.remove('hidden'); modal.classList.add('flex');
+        try{ frame.src = '/media-library/index.html'; }catch(e){}
+      });
+      function close(){ modal.classList.add('hidden'); modal.classList.remove('flex'); frame.src='/media-library/index.html'; }
+      closeBtn && closeBtn.addEventListener('click', close);
+      modal.addEventListener('click', function(e){ if(e.target===modal) close(); });
+    })();
+  </script>
+
+  <script>
+    (function(){
+      if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return;
+      const isFile = location.protocol === 'file:';
+      const isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+      if (isFile) return console.warn('Skipping SW registration: opened via file://');
+      if (!isLocalhost && location.protocol !== 'https:') return console.warn('Skipping SW registration: not secure context');
+      navigator.serviceWorker.register('/sw.js').then(()=>{
+        console.log('Service worker registered');
+      }).catch((e)=>console.warn('SW register failed', e));
+    })();
+  </script>
+
+  <!-- Offline Media modal (iframe) -->
+  <div id="offlineModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50">
+    <div class="bg-white w-[92%] h-[88%] rounded-lg shadow-lg overflow-hidden border">
+      <div class="flex items-center justify-between bg-teal-700 text-white px-4 py-2">
+        <div class="flex items-center gap-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A2 2 0 0122 9.618v4.764a2 2 0 01-2.447 1.894L15 14v-4zM4 6v12a2 2 0 002 2h7V4H6a2 2 0 00-2 2z"/>
+          </svg>
+          <strong>Offline Media</strong>
+        </div>
+        <div>
+          <button id="offlineClose" class="bg-white/20 hover:bg-white/30 px-3 py-1 rounded text-white">Close</button>
+        </div>
+      </div>
+      <iframe id="offlineFrame" src="/offline-media/index.html" style="width:100%;height:calc(100% - 44px);border:0;background:white"></iframe>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const link = document.getElementById('offlineMediaLink');
+      const modal = document.getElementById('offlineModal');
+      const closeBtn = document.getElementById('offlineClose');
+      const frame = document.getElementById('offlineFrame');
+      if(!link || !modal) return;
+      // Prevent default navigation and open modal instead
+      link.addEventListener('click', function(e){
+        // If user held ctrl/meta to open in new tab, allow it
+        if(e.metaKey || e.ctrlKey || e.shiftKey) return;
+        e.preventDefault();
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        try{ frame.src = link.href; }catch(e){}
+      });
+      function close(){ modal.classList.add('hidden'); modal.classList.remove('flex'); }
+      closeBtn && closeBtn.addEventListener('click', close);
+      modal.addEventListener('click', function(e){ if(e.target===modal) close(); });
+    })();
+    // listen for child iframe requests
+    window.addEventListener('message', (e)=>{
+      try{ const msg = e.data; if(msg && msg.type === 'mh_close_media_modal'){ const modal = document.getElementById('offlineModal'); if(modal){ modal.classList.add('hidden'); modal.classList.remove('flex'); const frame=document.getElementById('offlineFrame'); if(frame) frame.src='/offline-media/index.html'; } } }catch(e){}
+    });
+    (function(){
+      const embToggle = document.getElementById('offlineEmbedToggle');
+      const pane = document.getElementById('offlineSidebarPane');
+      const paneClose = document.getElementById('offlineSidebarClose');
+      const paneFrame = document.getElementById('offlineSidebarFrame');
+      const link = document.getElementById('offlineMediaLink');
+      if(!embToggle || !pane) return;
+      embToggle.addEventListener('click', function(){
+        if(pane.classList.contains('hidden')){
+          pane.classList.remove('hidden');
+          // load iframe
+          try{ paneFrame.src = (link && link.href) || '/offline-media/index.html'; }catch(e){}
+          embToggle.textContent = 'Hide';
+        } else {
+          pane.classList.add('hidden');
+          embToggle.textContent = 'Embed';
+        }
+      });
+      paneClose && paneClose.addEventListener('click', ()=>{ pane.classList.add('hidden'); embToggle.textContent='Embed'; });
+    })();
+    (function(){
+      // Sidebar media quick-play
+      const link = document.getElementById('mediaSidebarLink');
+      const pane = document.getElementById('mediaSidebarPane');
+      const closeBtn = document.getElementById('mediaClose');
+      const listEl = document.getElementById('mediaList');
+      const filter = document.getElementById('mediaFilter');
+      if(!link || !pane || !listEl) return;
+
+      function openDB(){
+        return new Promise((res,rej)=>{
+          const r = indexedDB.open('offline-media-db',1);
+          r.onupgradeneeded = ()=>{ const db=r.result; if(!db.objectStoreNames.contains('media')) db.createObjectStore('media',{keyPath:'id',autoIncrement:true}); };
+          r.onsuccess = ()=>res(r.result);
+          r.onerror = ()=>rej(r.error);
+        });
+      }
+
+      async function getAll(){ const db = await openDB(); return new Promise((res,rej)=>{ const tx=db.transaction('media','readonly'); const s=tx.objectStore('media'); const rq=s.getAll(); rq.onsuccess=()=>res(rq.result); rq.onerror=()=>rej(rq.error); }); }
+
+      async function refresh(){
+        const items = await getAll().catch(()=>[]);
+        const f = (filter && filter.value) || 'all';
+        listEl.innerHTML='';
+        const filtered = items.filter(it=> f==='all' || it.type===f);
+        if(!filtered.length) { listEl.innerHTML='<div class="muted">No media</div>'; return; }
+        filtered.forEach(it=>{
+          const row = document.createElement('div'); row.className='mb-2 p-2 bg-gray-50 rounded flex items-center justify-between';
+          const meta = document.createElement('div'); meta.style.maxWidth='60%';
+          const title = document.createElement('div'); title.textContent = it.title || it.origName || ('Item '+it.id);
+          const sub = document.createElement('div'); sub.textContent = `${it.type} • ${new Date(it.created).toLocaleString()}`; sub.style.fontSize='12px'; sub.style.color='#475569';
+          meta.appendChild(title); meta.appendChild(sub);
+          const actions = document.createElement('div');
+          const play = document.createElement('button'); play.textContent='▶'; play.title='Play'; play.className='mr-1';
+          const dl = document.createElement('button'); dl.textContent='⤓'; dl.title='Download'; dl.className='mr-1';
+          const modalBtn = document.createElement('button'); modalBtn.textContent='Open'; modalBtn.title='Open in modal'; modalBtn.className='mr-1';
+          const del = document.createElement('button'); del.textContent='✖'; del.title='Delete'; del.style.color='crimson';
+          play.addEventListener('click', ()=>{
+            const videoEl = document.getElementById('mediaVideo');
+            const audioEl = document.getElementById('mediaAudio');
+            const playerWrap = document.getElementById('mediaPlayer');
+            // revoke previous URLs
+            if(window._mh_currentUrl){ try{ URL.revokeObjectURL(window._mh_currentUrl); }catch(e){} window._mh_currentUrl=null; }
+            const url = URL.createObjectURL(it.blob); window._mh_currentUrl = url;
+            if(it.type==='video'){
+              audioEl.style.display='none'; audioEl.pause();
+              videoEl.style.display='block'; videoEl.src = url; videoEl.play().catch(()=>{});
+            } else {
+              videoEl.style.display='none'; videoEl.pause(); videoEl.src='';
+              audioEl.style.display='block'; audioEl.src = url; audioEl.play().catch(()=>{});
+            }
+            playerWrap.classList.remove('hidden');
+            // now playing update
+            const now = document.getElementById('nowPlayingBar');
+            const nowTitle = document.getElementById('nowPlayingTitle');
+            if(now && nowTitle){ now.classList.remove('hidden'); nowTitle.textContent = it.title || it.origName || ('Item '+it.id); }
+          });
+          dl.addEventListener('click', ()=>{ const url=URL.createObjectURL(it.blob); const a=document.createElement('a'); a.href=url; a.download=it.origName||it.title||'media'; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000); });
+          modalBtn.addEventListener('click', ()=>{
+            const modal = document.getElementById('offlineModal'); const frame = document.getElementById('offlineFrame');
+            if(!modal || !frame) return alert('Modal not available');
+            // create object URL for blob and set as param for the iframe to pick up
+            try{ if(window._mh_modalUrl){ URL.revokeObjectURL(window._mh_modalUrl); window._mh_modalUrl=null; } }catch(e){}
+            const url = URL.createObjectURL(it.blob); window._mh_modalUrl = url;
+            frame.src = '/offline-media/index.html#play?src=' + encodeURIComponent(url) + '&title=' + encodeURIComponent(it.title||it.origName||'');
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+          });
+          del.addEventListener('click', async ()=>{ if(!confirm('Delete this item?')) return; const db=await openDB(); const tx=db.transaction('media','readwrite'); tx.objectStore('media').delete(it.id); tx.oncomplete=()=>refresh(); });
+          actions.appendChild(play); actions.appendChild(dl); actions.appendChild(modalBtn); actions.appendChild(del);
+          row.appendChild(meta); row.appendChild(actions); listEl.appendChild(row);
+        });
+      }
+
+      // upload wiring
+      const uploadInput = document.getElementById('mediaUploadInput');
+      const uploadBtn = document.getElementById('mediaUploadBtn');
+      uploadBtn && uploadBtn.addEventListener('click', async ()=>{
+        const files = (uploadInput && uploadInput.files) ? Array.from(uploadInput.files) : [];
+        if(!files.length) return alert('Choose files to upload');
+        uploadBtn.disabled = true; uploadBtn.textContent='Uploading...';
+        try{
+          const db = await openDB();
+          for(const f of files){
+            const guessed = f.type && f.type.startsWith('video') ? 'video' : 'audio';
+            const tx = db.transaction('media','readwrite'); tx.objectStore('media').add({ title: f.name, type: guessed, blob: f, origName: f.name, created: Date.now() });
+            await new Promise(r=>{ tx.oncomplete = r; tx.onerror = r; });
+          }
+          uploadInput.value='';
+          await refresh();
+          alert('Uploaded');
+        }catch(e){ console.warn(e); alert('Upload failed'); }
+        uploadBtn.disabled = false; uploadBtn.textContent='Upload';
+      });
+
+      link.addEventListener('click', (e)=>{ e.preventDefault(); pane.classList.toggle('hidden'); if(!pane.classList.contains('hidden')) refresh(); });
+      closeBtn && closeBtn.addEventListener('click', ()=> pane.classList.add('hidden'));
+      filter && filter.addEventListener('change', refresh);
+    })();
+  </script>
+</html>
